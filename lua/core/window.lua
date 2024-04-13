@@ -1,4 +1,10 @@
-local Window = {}
+--------------------------------------------------
+local Window = {} -- Module declaration
+--------------------------------------------------
+
+--------------------------------------------------
+-- Module Api
+--------------------------------------------------
 
 --
 -- Set focus on a giwen window
@@ -7,7 +13,7 @@ function Window.setCurrentWindow(window)
   if vim.api.nvim_win_is_valid(window) then
     vim.api.nvim_set_current_win(window)
   else
-    print("Window " .. window .. " does not exist.")
+    notify("Window " .. window .. " does not exist.", vim.log.levels.WARN)
   end
 end
 
@@ -39,32 +45,34 @@ end
 -- Dock current window to the right side
 --
 function Window.dockCurrentWindowToRightSide(size)
-  vim.cmd('wincmd L')
-  vim.cmd('setlocal winfixwidth')
-  vim.cmd('vertical resize '.. size)
-  vim.cmd('set nowrap')
+  executeCommand('wincmd L')
+  executeCommand('setlocal winfixwidth')
+  executeCommand('vertical resize ' .. size)
+  executeCommand('set nowrap')
 end
 
 --
 -- Dock current window to the bottom
 --
 function Window.dockCurrentWindowToBottom(size)
-  vim.cmd('wincmd J')
-  vim.cmd('setlocal winfixheight')
-  vim.cmd('resize '.. size)
+  executeCommand('wincmd J')
+  executeCommand('setlocal winfixheight')
+  executeCommand('resize ' .. size)
 end
+
+--------------------------------------------------
+-- TODO: Api methods to try out
+--------------------------------------------------
 
 --
 -- Check if window is floating
--- TODO: not used yet!
 --
 --function isFloating(window)
---  return vim.api.nvim_win_get_config(window).relative ~= '' 
+--  return vim.api.nvim_win_get_config(window).relative ~= ''
 --end
 
--- 
+--
 -- Create floating window
--- TODO: not used yet!
 --
 --function createFloatingWindow()
 --  let buf = nvim_create_buf(v:false, v:true)
@@ -77,4 +85,6 @@ end
 --  call nvim_win_set_option(win, 'winhl', 'Normal:MyHighlight')
 --:end
 
-return Window -- Return the module containing all methods
+--------------------------------------------------
+return Window -- Return the module
+--------------------------------------------------

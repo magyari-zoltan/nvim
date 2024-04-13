@@ -1,4 +1,7 @@
---------------------------------------------------------------------------------
+--------------------------------------------------
+-- Private methods
+--------------------------------------------------
+
 -- Default keymap
 local function default_keymaps(lsp_zero, bufnr)
   lsp_zero.default_keymaps({
@@ -13,7 +16,6 @@ local function default_keymaps(lsp_zero, bufnr)
   })
 end
 
---------------------------------------------------------------------------------
 -- Configure formatting
 local function configure_formatting(client)
   if client.supports_method('textDocument/formatting') then
@@ -21,7 +23,6 @@ local function configure_formatting(client)
   end
 end
 
---------------------------------------------------------------------------------
 -- Language server configurations
 local function configure_lang_servers(lsp_zero)
   local lspconfig = require('lspconfig')
@@ -29,28 +30,28 @@ local function configure_lang_servers(lsp_zero)
   require('mason').setup({})
   require('mason-lspconfig').setup({
     handlers = {
-      --------------------------------------------------------------------------
+      ------------------------------------------------------
       -- default settings
       lsp_zero.default_setup,
 
-      --------------------------------------------------------------------------
+      ------------------------------------------------------
       -- default handler for all servers
       function(server_name)
         require('lspconfig')[server_name].setup({})
       end,
 
-      --------------------------------------------------------------------------
+      ------------------------------------------------------
       -- lua
       lua_ls = function()
         local opts = lsp_zero.nvim_lua_ls()
         lspconfig.lua_ls.setup(opts)
       end,
 
-      --------------------------------------------------------------------------
+      ------------------------------------------------------
       -- java
       jdtls = lsp_zero.noop, -- Java lsp server won't be handled by lsp-zero, it will be handled by nvim-jdtls plugin
 
-      --------------------------------------------------------------------------
+      ------------------------------------------------------
       -- ts server
       tsserver = function()
         -- Disable a feature for a specific server
@@ -62,6 +63,7 @@ local function configure_lang_servers(lsp_zero)
           -- end,
         })
       end
+      ------------------------------------------------------
     },
     ensure_installed = { 'lua_ls', 'jdtls', 'tsserver' }, -- Automatically install the listed language servers
     automatic_installation = true,                        -- Automatically install missing servers
@@ -71,7 +73,6 @@ local function configure_lang_servers(lsp_zero)
   require('plugins.nvim-jdtls')
 end
 
---------------------------------------------------------------------------------
 -- Configure autocompletion
 local function configure_autocompletion()
   local cmp = require('cmp')
@@ -134,7 +135,6 @@ local function configure_autocompletion()
   })
 end
 
---------------------------------------------------------------------------------
 -- Lsp zero configurations
 local function setupPlugin()
   local lsp_zero = require('lsp-zero')
@@ -164,11 +164,16 @@ local function setupPlugin()
   configure_autocompletion()
 end
 
---------------------------------------------------------------------------------
--- Error handler
+--------------------------------------------------
+-- Error handling
+--------------------------------------------------
 local function errorHandler(error)
-  vim.notify('Lsp plugin could not be loaded!')
-  vim.notify(error)
+  vim.notify('Lsp plugin could not be loaded!', WARN)
+  vim.notify(error, ERROR)
 end
 
+--------------------------------------------------
+-- Entrypoint
+--------------------------------------------------
 tryCatch(setupPlugin, errorHandler)
+--------------------------------------------------

@@ -1,3 +1,6 @@
+--------------------------------------------------
+-- Private methods
+--------------------------------------------------
 local function setupPlugin()
   require("telescope").setup {
     create_layout = function(picker)
@@ -61,9 +64,16 @@ local function setupPlugin()
   vim.keymap.set('n', '<leader>fn', createCommand('Telescope notify'), {})
 end
 
+--------------------------------------------------
+-- Error handling
+--------------------------------------------------
 local function errorHandler(error)
-  vim.notify('Telescope plugin could not be loaded!')
-  vim.notify(error)
+  notify('Telescope plugin could not be loaded!', WARN)
+  notify(error, ERROR)
 end
 
+--------------------------------------------------
+-- Entrypoint
+--------------------------------------------------
 tryCatch(setupPlugin, errorHandler)
+--------------------------------------------------

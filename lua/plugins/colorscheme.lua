@@ -1,16 +1,17 @@
+--------------------------------------------------
+-- Private methods
+--------------------------------------------------
 local function setColorscheme(colorscheme)
-  local is_ok, _ = pcall(vim.cmd, "colorscheme " .. colorscheme)
-
-  if not is_ok then
-    vim.notify('colorscheme ' .. colorscheme .. ' not found!')
-  end
+  executeCommand("colorscheme " .. colorscheme)
 end
 
 local function errorHandler(error)
-  vim.notify('Gruvbox colorscheme could not be loaded!')
-  vim.notify(error)
+  notify('Colorscheme could not be loaded!', WARN)
+  notify(error, ERROR)
 end
 
+--------------------------------------------------
+-- Entrypoint
+--------------------------------------------------
 tryCatch(setColorscheme, errorHandler, 'gruvbox')
-
-
+--------------------------------------------------

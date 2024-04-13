@@ -273,9 +273,25 @@ local function jdtls_setup(event)
   })
 end
 
-vim.api.nvim_create_autocmd('FileType', {
-  group = java_cmds,
-  pattern = { 'java' },
-  desc = 'Setup jdtls',
-  callback = jdtls_setup,
-})
+local function setupPlugin()
+  vim.api.nvim_create_autocmd('FileType', {
+    group = java_cmds,
+    pattern = { 'java' },
+    desc = 'Setup jdtls',
+    callback = jdtls_setup,
+  })
+end
+
+--------------------------------------------------
+-- Error handling
+--------------------------------------------------
+local function errorHandler(error)
+  notify('JDTLS language server could not be started!', WARN)
+  notify(error, ERROR)
+end
+
+--------------------------------------------------
+-- Entrypoint
+--------------------------------------------------
+tryCatch(setupPlugin, errorHandler)
+--------------------------------------------------

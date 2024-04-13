@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 -- Keymaps
 --------------------------------------------------------------------------------
-local window = require('core.window')
-local dockCurrentWindowToBottom = window.dockCurrentWindowToBottom
+local Window = require('core.window')
+local dockCurrentWindowToBottom = Window.dockCurrentWindowToBottom
 
 -- Leader key
 vim.g.mapleader = '-'
@@ -40,12 +40,13 @@ vim.keymap.set('n', '%%', ':source %<Enter>', { noremap = true })
 -- vim.keymap.set('n', '<leader>fb',':buffer ',                                    { noremap = true })
 
 -- Terminal
-local function Terminal()
-  vim.api.nvim_command('split')
+local function openTerminalWindow()
+  executeCommand('split')
   dockCurrentWindowToBottom(10)
-  vim.api.nvim_command('terminal')
+  executeCommand('terminal')
 end
-vim.keymap.set('n', '<C-t>', Terminal, { noremap = true })
+
+vim.keymap.set('n', '<C-t>', openTerminalWindow, { noremap = true })
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { noremap = true })
 vim.keymap.set('t', '<C-h>', '<C-\\><C-n><C-w>h', { noremap = true })
 vim.keymap.set('t', '<C-j>', '<C-\\><C-n><C-w>j', { noremap = true })

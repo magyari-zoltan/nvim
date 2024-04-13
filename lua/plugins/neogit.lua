@@ -1,3 +1,6 @@
+--------------------------------------------------
+-- Private methods
+--------------------------------------------------
 local function setupPlugin()
   local neogit = require("neogit")
 
@@ -26,7 +29,7 @@ local function setupPlugin()
 
     -- "ascii"   is the graph the git CLI generates
     -- "unicode" is the graph like https://github.com/rbong/vim-flog
-    graph_style = "ascii", 
+    graph_style = "ascii",
 
     -- Used to generate URL's for branch popup action "pull request".
     git_services = {
@@ -281,9 +284,16 @@ local function setupPlugin()
   vim.keymap.set('n', '<m-g>', gitStatus, { noremap = true })
 end
 
+--------------------------------------------------
+-- Error handling
+--------------------------------------------------
 local function errorHandler(error)
   vim.notify('Neogit plugin could not be loaded!')
   vim.notify(error)
 end
 
+--------------------------------------------------
+-- Entrypoint
+--------------------------------------------------
 tryCatch(setupPlugin, errorHandler)
+--------------------------------------------------
