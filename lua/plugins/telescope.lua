@@ -58,6 +58,7 @@ local function setupPlugin()
   vim.keymap.set('n', '<leader>fg', builtin.git_files, {})
   vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
   vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+  vim.keymap.set('n', '<leader>fn', createCommand('Telescope notify'), {})
 end
 
 local function errorHandler(error)

@@ -19,6 +19,11 @@ return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
   ------------------------------------------------------------------------------
+  -- Notification
+  use 'rcarriga/nvim-notify'
+  require('plugins.nvim-notify')
+
+  ------------------------------------------------------------------------------
   -- Colorcheme
   use 'ellisonleao/gruvbox.nvim'
   require('plugins.colorscheme')
