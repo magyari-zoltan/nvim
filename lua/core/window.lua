@@ -19,6 +19,23 @@ function Window.getCurrentWindow()
 end
 
 --
+-- Returns true if the window with the given window id is still open
+--
+function Window.isWindowOpen(window_id)
+  local windows = vim.api.nvim_list_wins()
+  local exists = false
+
+  for _, win in ipairs(windows) do
+    if win == window_id then
+      exists = true
+      break
+    end
+  end
+
+  return exists
+end
+
+--
 -- Dock current window to the right side
 --
 function Window.dockCurrentWindowToRightSide(size)
