@@ -1,7 +1,43 @@
-function _G.tryCatch(resolve, reject, args)
-    local ok, message = pcall(resolve, args or {})
+--
+-- Log levels
+--
+_G.TRACE = vim.log.levels.TRACE
+_G.DEBUG = vim.log.levels.DEBUG
+_G.INFO = vim.log.levels.INFO
+_G.WARN = vim.log.levels.WARN
+_G.ERROR = vim.log.levels.ERROR
+_G.OFF = vim.log.levels.OFF
 
-    if not ok then
-      reject(message)
-    end
+--
+--
+--
+function _G.createCommand(command)
+  return function()
+    vim.api.nvim_command(command)
+  end
+end
+
+--
+-- Executes a neo vim command
+--
+function _G.executeCommand(command)
+  vim.api.nvim_command(command)
+end
+
+--
+-- Send a notification message to user
+--
+function _G.notify(message, level, opts)
+  vim.notify(message, level, opts)
+end
+
+--
+-- Wraps a function into an error handler
+--
+function _G.tryCatch(resolve, reject, args)
+  local ok, message = pcall(resolve, args or {})
+
+  if not ok then
+    reject(message)
+  end
 end
