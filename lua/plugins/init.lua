@@ -28,7 +28,6 @@ return require('packer').startup(function(use)
   use 'ellisonleao/gruvbox.nvim'
   require('plugins.colorscheme')
 
-  ------------------------------------------------------------------------------
   -- File manager
   use 'nvim-tree/nvim-tree.lua'
   require('plugins.nvim-tree')
@@ -53,21 +52,34 @@ return require('packer').startup(function(use)
 
   ------------------------------------------------------------------------------
   -- Git
-  use { 'NeogitOrg/neogit',
+  -- TODO: Remove if the vim-fugitive is enough good for you
+  -- use { 'NeogitOrg/neogit',
+
+  --   requires = {
+  --     { 'sindrets/diffview.nvim' },
+  --     { 'mhinz/vim-signify' },
+  --     { 'tpope/vim-fugitive' },
+  --     { 'junegunn/gv.vim' },
+
+  --     -- Telescope
+  --     { 'nvim-telescope/telescope.nvim',
+  --       requires = { 'nvim-lua/plenary.nvim' }
+  --     }
+  --   },
+  -- }
+  -- require('plugins.neogit')
+
+  use { 'tpope/vim-fugitive',
 
     requires = {
       { 'sindrets/diffview.nvim' },
       { 'mhinz/vim-signify' },
-      { 'tpope/vim-fugitive' },
       { 'junegunn/gv.vim' },
+    }
 
-      -- Telescope
-      { 'nvim-telescope/telescope.nvim',
-        requires = { 'nvim-lua/plenary.nvim' }
-      }
-    },
   }
-  require('plugins.neogit')
+  require('plugins.fugitive')
+
 
   ------------------------------------------------------------------------------
   -- Lsp
