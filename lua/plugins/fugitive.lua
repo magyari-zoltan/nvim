@@ -1,63 +1,58 @@
 --------------------------------------------------
 -- Dependencies
 --------------------------------------------------
-local Window = require('core.window')
-require('core.winkeymaps').setup()
+local window = require('core.window')
+local keymap = require('core.keymap')
 --------------------------------------------------
 
 --------------------------------------------------
 -- Private methods
 --------------------------------------------------
-local dockCurrentWindowToRightSide = Window.dockCurrentWindowToRightSide
-local getCurrentWindow = Window.getCurrentWindow
-local setCurrentWindow = Window.setCurrentWindow
+local dockCurrentWindowToRightSide = window.dockCurrentWindowToRightSide
+local getCurrentWindow = window.getCurrentWindow
+local registerOnWindowFocusKeymapper = keymap.registerOnWindowFocusKeymapper
 
 --
--- Open git commit window
+-- Open file history view
 --
-local function openGitCommitWindow(window_id, args)
-  setCurrentWindow(window_id)
-  executeCommand(':Git commit ' .. (args or ''))
-end
-
---
--- Setup keybinding for this window
---
-local function setupKeymapForFugitiveWindow()
+local function openFileHistoryWindow()
   local window_id = getCurrentWindow()
 
-  setKeymap(window_id, '<C-a>', ':Git add .<Enter>')
-
-  setKeymap(window_id, '<C-k>', function()
-    openGitCommitWindow(window_id)
+  executeCommand('DiffviewFileHistory')
+  registerOnWindowFocusKeymapper(window_id, function(keybinding)
+    keybinding('n', 'q', createCommand('DiffviewClose'))
   end)
-
-  setKeymap(window_id, '<C-k>a', function()
-    openGitCommitWindow(window_id, '--amend')
-  end)
-end
-
---
--- Open fugitive window
---
-local function openFugitveWindow()
-  executeCommand('Git') -- Opens fugitive window
 end
 
 --
 -- Opens git status window
 --
 local function openGitStatusWindow()
+  local function openFugitveWindow()
+    executeCommand('Git') -- Opens fugitive window
+  end
+
   openFugitveWindow()
   dockCurrentWindowToRightSide(50)
-  setupKeymapForFugitiveWindow()
+
+  local window_id = getCurrentWindow()
+  local function closeWindow()
+    vim.api.nvim_win_close(window_id, false)
+  end
+  registerOnWindowFocusKeymapper(window_id, function(keybinding)
+    keybinding('n', 'q', closeWindow)
+  end)
 end
 
---
+--------------------------------------------------
 -- Configure plugin
---
+--------------------------------------------------
 local function setupPlugin()
-  vim.keymap.set('n', '<A-g>', openGitStatusWindow, { noremap = true })
+  vim.keymap.set('n', 'gb', createCommand('Git blame'))
+  vim.keymap.set('n', 'gs', openGitStatusWindow)
+  vim.keymap.set('n', 'gl', createCommand('GV HEAD master'))
+  vim.keymap.set('n', 'gla', createCommand('GV --all'))
+  vim.keymap.set('n', 'gh', function() openFileHistoryWindow() end)
 end
 
 --------------------------------------------------

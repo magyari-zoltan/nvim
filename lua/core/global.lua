@@ -32,12 +32,33 @@ function _G.notify(message, level, opts)
 end
 
 --
+-- Do nothing
+--
+function _G.doNothing()
+end
+
+--
+-- Wraps a function into an error handler
+--
+function _G.try(resolve, args)
+  local ok, message = pcall(resolve, args or {})
+
+  if not ok then
+    notify(message, TRACE)
+  end
+end
+
+--
 -- Wraps a function into an error handler
 --
 function _G.tryCatch(resolve, reject, args)
   local ok, message = pcall(resolve, args or {})
 
   if not ok then
-    reject(message)
+    if reject then
+      reject(message)
+    else
+      notify(message, TRACE)
+    end
   end
 end
