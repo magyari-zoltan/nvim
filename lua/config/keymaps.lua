@@ -36,9 +36,6 @@ vim.keymap.set('i', '<C-l>', '<C-w>l', { noremap = true })
 -- Source
 vim.keymap.set('n', '%%', ':source %<Enter>', { noremap = true })
 
--- Find
--- vim.keymap.set('n', '<leader>fb',':buffer ',                                    { noremap = true })
-
 -- Terminal
 local function openTerminalWindow()
   executeCommand('split')

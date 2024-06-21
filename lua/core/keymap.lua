@@ -12,33 +12,52 @@ local Window = require('core.window')
 --------------------------------------------------
 
 --------------------------------------------------
+-- Class Keymapper
+--------------------------------------------------
+
+-- Class definition
+local Keymapper = {}
+Keymapper.__index = Keymapper
+
+--
+-- Constructor
+--
+-- @param windowId: the
+function Keymapper:new(windowId, onKeymap)
+  local instance = setmetatable({}, Keymapper)
+  instance.windowId = windowId
+  instance.onKeymap = onKeymap
+  return instance
+end
+
+--------------------------------------------------
 -- Private methods
 --------------------------------------------------
 local isWindowOpen = Window.isWindowOpen
 local getCurrentWindow = Window.getCurrentWindow
 
 local function deleteMapping(mapping)
-  notify('deleteKeyMapping: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
+  -- notify('deleteKeyMapping: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
   vim.api.nvim_del_keymap(mapping.mode, mapping.key)
 end
 
 local function createMapping(mapping)
-  notify('createMapping: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
+  -- notify('createMapping: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
   vim.keymap.set(mapping.mode, mapping.key, mapping.command, mapping.opts)
 end
 
 local function getKeymapperFromRegistry(window_id)
-  notify('getKeymapperFromRegistry: ' .. window_id, DEBUG)
+  -- notify('getKeymapperFromRegistry: ' .. window_id, DEBUG)
   return WindowKeyMapper[window_id]
 end
 
 local function registerKeymapper(window_id, on_keymap)
-  notify('registerKeymapper: ' .. window_id, DEBUG)
+  -- notify('registerKeymapper: ' .. window_id, DEBUG)
   WindowKeyMapper[window_id] = on_keymap
 end
 
 local function registerKeymap(window_id, mapping)
-  notify('registerKeymap: ' .. tostring(window_id) .. ',' .. mapping.mode .. ',' .. mapping.key, DEBUG)
+  -- notify('registerKeymap: ' .. tostring(window_id) .. ',' .. mapping.mode .. ',' .. mapping.key, DEBUG)
   table.insert(WindowMappedKeys[window_id], {
     mode = mapping.mode,
     key = mapping.key
@@ -46,13 +65,13 @@ local function registerKeymap(window_id, mapping)
 end
 
 local function clearRegistries(window_id)
-  notify('clearRegistries: ' .. window_id, DEBUG)
+  -- notify('clearRegistries: ' .. window_id, DEBUG)
   WindowKeyMapper[window_id] = {}
   WindowMappedKeys[window_id] = {}
 end
 
 local function deleteMappings(window_id)
-  notify('deleteMappings: ' .. window_id, DEBUG)
+  -- notify('deleteMappings: ' .. window_id, DEBUG)
 
   local bindings = WindowMappedKeys[window_id]
   if bindings then
@@ -60,15 +79,15 @@ local function deleteMappings(window_id)
       try(deleteMapping, binding)
     end
   else
-    notify('deleteMappings: bindings is nil: ' .. window_id, TRACE)
+    -- notify('deleteMappings: bindings is nil: ' .. window_id, TRACE)
   end
 end
 
 local function mapAllKeysForWindow(window_id, on_keymap, keymapper)
-  notify('mapAllKeysForWindow: ' .. window_id .. ',' .. tostring(on_keymap), DEBUG)
+  -- notify('mapAllKeysForWindow: ' .. window_id .. ',' .. tostring(on_keymap), DEBUG)
 
   local function mapSingleKey(mode, key, command, opts)
-    notify('mapAllKeysForWindow: mapSingleKey:' .. window_id .. ',' .. tostring(mode) .. ',' .. tostring(key), DEBUG)
+    -- notify('mapAllKeysForWindow: mapSingleKey:' .. window_id .. ',' .. tostring(mode) .. ',' .. tostring(key), DEBUG)
     keymapper.createMapping({
       mode = mode,
       key = key,
@@ -84,7 +103,7 @@ local function mapAllKeysForWindow(window_id, on_keymap, keymapper)
   if isWindowOpen(window_id) then
     tryCatch(on_keymap, keymapper.errorHandler, mapSingleKey)
   else
-    notify('mapAllKeysForWindow: window is closed: ' .. window_id, TRACE)
+    -- notify('mapAllKeysForWindow: window is closed: ' .. window_id, TRACE)
   end
 end
 
@@ -93,13 +112,13 @@ end
 --------------------------------------------------------------------------------
 
 function Keymap.registerOnWindowFocusKeymapper(window_id, on_keymap)
-  notify('registerWindowKeymapper: ' .. window_id .. ',' .. tostring(on_keymap), DEBUG)
+  -- notify('registerWindowKeymapper: ' .. window_id .. ',' .. tostring(on_keymap), DEBUG)
 
   if window_id and on_keymap then
     registerKeymapper(window_id, on_keymap)
 
     local function errorHandler(error)
-      notify('registerWindowKeymapper: errorHandler: ' .. window_id .. ',' .. tostring(error), TRACE)
+      -- notify('registerWindowKeymapper: errorHandler: ' .. window_id .. ',' .. tostring(error), TRACE)
       clearRegistries(window_id)
     end
 
@@ -109,7 +128,7 @@ function Keymap.registerOnWindowFocusKeymapper(window_id, on_keymap)
       errorHandler = errorHandler
     })
   else
-    notify('registerWindowKeymapper: condition not fullfilled: ' .. window_id .. ',' .. tostring(on_keymap), TRACE)
+    -- notify('registerWindowKeymapper: condition not fullfilled: ' .. window_id .. ',' .. tostring(on_keymap), TRACE)
   end
 end
 
@@ -123,7 +142,7 @@ vim.api.nvim_create_autocmd("WinClosed", {
   pattern = "*",
   callback = function()
     local window_id = getCurrentWindow()
-    notify('WinClosed: ' .. window_id, DEBUG)
+    -- notify('WinClosed: ' .. window_id, DEBUG)
 
     deleteMappings(window_id)
     clearRegistries(window_id)
@@ -135,7 +154,7 @@ vim.api.nvim_create_autocmd("WinLeave", {
   pattern = "*",
   callback = function()
     local window_id = getCurrentWindow()
-    notify('WinLeave: ' .. window_id, DEBUG)
+    -- notify('WinLeave: ' .. window_id, DEBUG)
 
     deleteMappings(window_id)
   end
@@ -146,7 +165,7 @@ vim.api.nvim_create_autocmd("WinEnter", {
   pattern = "*",
   callback = function()
     local window_id = getCurrentWindow()
-    notify('WinEnter: ' .. window_id, DEBUG)
+    -- notify('WinEnter: ' .. window_id, DEBUG)
 
     local on_keymap = getKeymapperFromRegistry(window_id)
     local keymapper = {
@@ -159,7 +178,7 @@ vim.api.nvim_create_autocmd("WinEnter", {
       clearRegistries(window_id)
       on_keymap = getKeymapperFromRegistry(window_id)
     else
-      notify('WinEnter: WindowMappedKeys is not nil!' .. window_id, TRACE)
+      -- notify('WinEnter: WindowMappedKeys is not nil!' .. window_id, TRACE)
       mapAllKeysForWindow(window_id, on_keymap, keymapper)
     end
   end
