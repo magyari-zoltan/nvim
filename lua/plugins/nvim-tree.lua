@@ -70,7 +70,7 @@ local function setupPlugin()
       sorter = "case_sensitive",
     },
     view = {
-      width = 40,
+      width = 60,
     },
     renderer = {
       group_empty = true,
