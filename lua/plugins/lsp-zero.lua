@@ -53,9 +53,9 @@ local function configure_lang_servers(lsp_zero)
 
       ------------------------------------------------------
       -- ts server
-      tsserver = function()
+      ts_ls = function()
         -- Disable a feature for a specific server
-        lspconfig.tsserver.setup({
+        lspconfig.ts_ls.setup({
           -- on_init = function(client)
           --  client.server_capabilities.semanticTokensProvider = nil
           --  client.server_capabilities.documentFormattingProvider = false
@@ -65,8 +65,8 @@ local function configure_lang_servers(lsp_zero)
       end
       ------------------------------------------------------
     },
-    ensure_installed = { 'lua_ls', 'jdtls', 'tsserver' }, -- Automatically install the listed language servers
-    automatic_installation = true,                        -- Automatically install missing servers
+    ensure_installed = { 'lua_ls', 'jdtls', 'ts_ls' }, -- Automatically install the listed language servers
+    automatic_installation = true,                     -- Automatically install missing servers
   })
 
   -- handling java lsp
