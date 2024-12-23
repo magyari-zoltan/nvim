@@ -74,6 +74,22 @@ local function setupPlugin()
     },
     renderer = {
       group_empty = true,
+      icons = {
+        glyphs = {
+          symlink = "",
+          folder = {
+            symlink = ""
+          },
+          git = {
+            untracked = "",
+            unstaged = "󰷉",
+            staged = "",
+            unmerged = "",
+            renamed = "",
+            deleted = ""
+          }
+        }
+      }
     },
     filters = {
       dotfiles = true,
