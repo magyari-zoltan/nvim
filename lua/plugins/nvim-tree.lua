@@ -76,19 +76,19 @@ local function setupPlugin()
       group_empty = true,
       icons = {
         glyphs = {
-          symlink = "",
+          symlink = "",
           folder = {
             arrow_closed = "▶", -- symbol when folder is closed
             arrow_open = "▼", -- symbol when folder is open
-            symlink = ""
+            symlink = "🔗"
           },
           git = {
-            untracked = "",
-            unstaged = "󰷉",
-            staged = "",
-            unmerged = "",
-            renamed = "",
-            deleted = ""
+            untracked = "➕",
+            unstaged = "✏️",
+            staged = "✔️",
+            unmerged = "⚔️",
+            renamed = "🏷️",
+            deleted = "🗑️"
           }
         }
       }
