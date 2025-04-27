@@ -78,6 +78,8 @@ local function setupPlugin()
         glyphs = {
           symlink = "",
           folder = {
+            arrow_closed = "▶", -- symbol when folder is closed
+            arrow_open = "▼", -- symbol when folder is open
             symlink = ""
           },
           git = {
