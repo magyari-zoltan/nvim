@@ -72,6 +72,11 @@ local function setupPlugin()
     view = {
       width = 60,
     },
+    git = {
+      enable = true,
+      show_on_dirs = true,       --  show git status on folders
+      show_on_open_dirs = false, -- 🚫 don't show on expanded folders either
+    },
     renderer = {
       group_empty = true,
       icons = {
