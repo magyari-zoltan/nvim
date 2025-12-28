@@ -13,6 +13,7 @@ vim.opt.splitright = true      -- open new horizontal splits right
 vim.opt.termguicolors = true   -- enabl 24-bit RGB color in the TUI
 vim.opt.showmode = true        -- we are experienced, wo don't need the "-- INSERT --" mode hint
 vim.opt.laststatus = 2
+vim.opt.wrap = false           -- do not wrap long lines
 
 -- Searching
 vim.opt.incsearch = true  -- search as characters are entered
