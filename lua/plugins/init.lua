@@ -154,6 +154,25 @@ local plugins = {
 		},
 	},
 
+	-- Github copilot
+	{
+		"github/copilot.vim",
+		event = "InsertEnter",
+	},
+
+	-- Copilot Chat
+	{
+		"CopilotC-Nvim/CopilotChat.nvim",
+		branch = "main",
+		dependencies = { "github/copilot.vim", "nvim-lua/plenary.nvim" },
+		cmd = { "CopilotChat", "CopilotChatToggle", "CopilotChatReset" },
+		keys = {
+			{ "<leader>ct", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
+			{ "<leader>cr", "<cmd>CopilotChatReset<cr>",  desc = "Reset Copilot Chat" },
+		},
+		opts = {},
+	},
+
 	-- Vim Wiki
 	{
 		'vimwiki/vimwiki',
