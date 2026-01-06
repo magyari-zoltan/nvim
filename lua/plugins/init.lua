@@ -158,6 +158,11 @@ local plugins = {
 	{
 		"github/copilot.vim",
 		event = "InsertEnter",
+		init = function()
+			vim.g.copilot_settings = vim.tbl_deep_extend("force", vim.g.copilot_settings or {}, {
+				model = "auto",
+			})
+		end,
 	},
 
 	-- Copilot Chat
@@ -165,12 +170,45 @@ local plugins = {
 		"CopilotC-Nvim/CopilotChat.nvim",
 		branch = "main",
 		dependencies = { "github/copilot.vim", "nvim-lua/plenary.nvim" },
-		cmd = { "CopilotChat", "CopilotChatToggle", "CopilotChatReset" },
+		cmd = {
+			"CopilotChat",
+			"CopilotChatOpen",
+			"CopilotChatClose",
+			"CopilotChatToggle",
+			"CopilotChatReset",
+			"CopilotChatStop",
+			"CopilotChatSave",
+			"CopilotChatLoad",
+			"CopilotChatModels",
+			"CopilotChatAgents",
+			"CopilotChatPrompts",
+			"CopilotChatExplain",
+			"CopilotChatReview",
+			"CopilotChatFix",
+			"CopilotChatOptimize",
+			"CopilotChatDocs",
+			"CopilotChatTests",
+			"CopilotChatCommit",
+			"CopilotChatCommitStaged",
+		},
 		keys = {
 			{ "<leader>ct", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
 			{ "<leader>cr", "<cmd>CopilotChatReset<cr>",  desc = "Reset Copilot Chat" },
 		},
-		opts = {},
+		opts = {
+			tools = {
+				"file",
+				"glob",
+				"grep",
+				"bash",
+				"git",
+				"gitdiff"
+			},
+			resources = {
+				"buffer:listed",
+				"glob",
+			},
+		},
 	},
 
 	-- Vim Wiki
