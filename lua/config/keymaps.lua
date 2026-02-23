@@ -38,9 +38,9 @@ vim.keymap.set('n', '%%', ':source %<Enter>', { noremap = true })
 
 -- Terminal
 local function openTerminalWindow()
-  executeCommand('split')
-  dockCurrentWindowToBottom(10)
-  executeCommand('terminal')
+	executeCommand('split')
+	dockCurrentWindowToBottom(10)
+	executeCommand('terminal')
 end
 
 vim.keymap.set('n', '<C-t>', openTerminalWindow, { noremap = true })

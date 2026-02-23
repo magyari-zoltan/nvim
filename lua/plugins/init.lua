@@ -211,22 +211,6 @@ local plugins = {
 		},
 	},
 
-	-- Vim Wiki
-	{
-		'vimwiki/vimwiki',
-		init = function()
-			vim.g.vimwiki_list = {
-				{
-					path = '~/.vimwiki',
-					syntax = 'markdown', -- default, markdown
-					ext = '.md', -- wiki, md
-				}
-			}
-
-			vim.g.vimwiki_global_ext = 0
-		end
-	},
-
 	-- Bookmarks
 	{
 		'MattesGroeger/vim-bookmarks'
@@ -244,6 +228,14 @@ local plugins = {
 		cmd = "StartupTime",
 		init = function()
 			vim.g.startuptime_tries = 10
+		end,
+	},
+
+	-- Markdown format
+	{
+		"stevearc/conform.nvim",
+		config = function()
+			require('plugins.conform')
 		end,
 	},
 }
