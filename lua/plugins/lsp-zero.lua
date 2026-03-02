@@ -64,6 +64,12 @@ local function configure_lang_servers(lsp_zero)
 	local lspconfig = require('lspconfig')
 
 	require('mason').setup({})
+	require('mason-tool-installer').setup({
+		ensure_installed = {
+			'prettier',
+		},
+		run_on_start = true,
+	})
 	require('mason-lspconfig').setup({
 		handlers = {
 			------------------------------------------------------

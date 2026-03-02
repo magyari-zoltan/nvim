@@ -100,6 +100,7 @@ local plugins = {
 			-- Lsp support
 			{ 'neovim/nvim-lspconfig' },
 			{ 'williamboman/mason.nvim' },
+			{ 'WhoIsSethDaniel/mason-tool-installer.nvim' },
 			{ 'williamboman/mason-lspconfig.nvim' },
 
 			-- Lsp improvements
