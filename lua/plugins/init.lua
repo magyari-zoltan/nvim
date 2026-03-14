@@ -217,6 +217,24 @@ local plugins = {
 		'MattesGroeger/vim-bookmarks'
 	},
 
+	-- Emmet
+	{
+		'mattn/emmet-vim',
+		ft = {
+			'html',
+			'css',
+			'javascriptreact',
+			'typescriptreact',
+			'javascript',
+			'typescript',
+			'vue',
+			'svelte',
+		},
+		init = function()
+			vim.g.user_emmet_expandabbr_key = '<C-e>'
+		end,
+	},
+
 	-- Editor
 	{
 		'tpope/vim-surround',
