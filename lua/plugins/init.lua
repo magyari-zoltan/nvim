@@ -3,36 +3,36 @@
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
--- A `stdpath("data")` visszaadja a Neovim adatkönyvtárát.
--- Linux alatt pl: `~/.local/share/nvim`
--- Így a `lazypath` értéke: `~/.local/share/nvim`
+-- `stdpath("data")` returns Neovim's data directory.
+-- On Linux, for example: `~/.local/share/nvim`
+-- This makes the `lazypath` value: `~/.local/share/nvim`
 --------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 --------------------------------------------------------------------------------
--- A `vim.uv` a Neovim beépített hozzáférése a `libuv` könyvtárhoz.
+-- `vim.uv` is Neovim's built-in access to the `libuv` library.
 --
--- A libuv egy alacsony szintű aszinkron I/O könyvtár, amelyet a Neovim számos művelethez használ:
+-- libuv is a low-level asynchronous I/O library that Neovim uses for many operations:
 --
---  * fájlműveletek 📄
---  * hálózati kommunikáció 🌐
---  * folyamatkezelés ⚙️
---  * időzítők ⏱️
---  * fájlrendszer figyelése 👀
+--  * file operations 📄
+--  * network communication 🌐
+--  * process management ⚙️
+--  * timers ⏱️
+--  * filesystem watching 👀
 --
--- A `vim.loop` a Neovim régebbi libuv API-ja.
+-- `vim.loop` is Neovim's older libuv API.
 --
--- Miért `vim.uv or vim.loop` ?
+-- Why `vim.uv or vim.loop` ?
 --
--- Ez a kód mindkettővel kompatibilis.
+-- This code is compatible with both.
 --
--- Ellenőrzöm, hogy létezik-e a könyvtár
+-- Check whether the directory exists
 --------------------------------------------------------------------------------
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	----------------------------------------------------------------------------
-	-- A `lazy.nvim` letöltése
+	-- Download `lazy.nvim`
 	--
-	-- A következő parancsot hajtja végre:
+	-- It executes the following command:
 	--
 	-- ```bash
 	-- git clone \
@@ -42,13 +42,13 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	--    ~/.local/share/nvim/lazy/lazy.nvim
 	-- ```
 	--
-	-- Mit jelent a `--filter=blob:none` ?
+	-- What does `--filter=blob:none` mean?
 	--
-	-- A Git nem tölti le azonnal a fájlok tartalmát, csak a szükséges
-	-- metaadatokat.
+	-- Git does not download file contents immediately, only the required
+	-- metadata.
 	--
-	-- ➡️ Gyorsabb klónozás
-	-- ➡️ Kevesebb hálózati forgalom
+	-- ➡️ Faster cloning
+	-- ➡️ Less network traffic
 	--
 	----------------------------------------------------------------------------
 	vim.fn.system({
@@ -62,16 +62,16 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 --------------------------------------------------------------------------------
--- A plugin hozzáadása a runtime path-hoz.
--- A `rtp` a runtimepath rövidítése.
+-- Add the plugin to the runtime path.
+-- `rtp` is short for runtimepath.
 --
--- A Neovim innen tölti be:
---  * pluginokat
---  * színsémákat
---  * Lua modulokat
---  * szintaxisfájloka
+-- Neovim loads these from here:
+--  * plugins
+--  * colorschemes
+--  * Lua modules
+--  * syntax files
 --
--- A prepend() a lista elejére teszi a lazy.nvim könyvtárát:
+-- prepend() puts the lazy.nvim directory at the beginning of the list:
 --
 -- ```text
 -- runtimepath =
@@ -334,24 +334,24 @@ local plugins = {
 }
 
 --------------------------------------------------------------------------------
--- Ez a sor indítja el a `lazy.nvim`-et.
+-- This line starts `lazy.nvim`.
 --
--- A `require("lazy") betölti a `lazy.nvim` Lua modulját.
+-- `require("lazy") loads the `lazy.nvim` Lua module.
 --
--- A `require(...)` a runtimepath-on keresi a modult. Ezért volt fontos
--- korábban ez a sor: `vim.opt.rtp:prepend(lazypath)`
+-- `require(...)` looks for the module on the runtimepath. That is why this
+-- earlier line was important: `vim.opt.rtp:prepend(lazypath)`
 --
--- A `.setup(...)` a betöltött modul setup() függvényét hívja meg:
+-- `.setup(...)` calls the setup() function on the loaded module:
 --
 -- ```lua
 --   local lazy = require("lazy")
 --   lazy.setup(plugins, opts)
 -- ```
 --
--- Ez:
---  * feldolgozza a plugin listát,
---  * telepíti a hiányzó pluginokat,
---  * beállítja a lazy loading szabályokat,
---  * betölti a szükséges pluginokat.
+-- This:
+--  * processes the plugin list,
+--  * installs the missing plugins,
+--  * configures the lazy loading rules,
+--  * loads the required plugins.
 --------------------------------------------------------------------------------
 require("lazy").setup(plugins, opts)
