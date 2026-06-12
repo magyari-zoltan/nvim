@@ -44,11 +44,22 @@ local function openGitStatusWindow()
 	end)
 end
 
+local function interactiveRebase()
+	vim.ui.input({ prompt = 'Rebase onto branch: ' }, function(branch)
+		if not branch or vim.trim(branch) == '' then
+			return
+		end
+
+		executeCommand('Git rebase -i ' .. vim.fn.fnameescape(vim.trim(branch)))
+	end)
+end
+
 --------------------------------------------------
 -- Configure plugin
 --------------------------------------------------
 local function setupPlugin()
 	vim.keymap.set('n', '<leader>gb', createCommand('Git blame'))
+	vim.keymap.set('n', '<leader>gr', interactiveRebase)
 	vim.keymap.set('n', '<leader>gs', openGitStatusWindow)
 	vim.keymap.set('n', '<leader>gl', createCommand('GV HEAD master'))
 	vim.keymap.set('n', '<leader>gla', createCommand('GV --all'))
