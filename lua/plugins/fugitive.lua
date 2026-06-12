@@ -44,6 +44,9 @@ local function openGitStatusWindow()
     end)
 end
 
+--
+-- Starts an interactive rebase: `git rebase -i <branch>`
+--
 local function interactiveRebase()
     vim.ui.input({ prompt = 'Rebase onto branch: ' }, function(branch)
         if not branch or vim.trim(branch) == '' then
@@ -54,12 +57,37 @@ local function interactiveRebase()
     end)
 end
 
+--
+-- Resets get a given number of commits: `git reset --mixed HEAD~<number>`
+--
+local function mixedReset()
+    vim.ui.input({ prompt = 'Reset (--mixed) commits from HEAD (default 1): ' }, function(commit_count)
+        if not commit_count then
+            return
+        end
+
+        commit_count = vim.trim(commit_count)
+        if commit_count == '' then
+            commit_count = '1'
+        end
+
+        local count = tonumber(commit_count)
+        if not count or count < 1 or count % 1 ~= 0 then
+            notify('Reset commit count must be a positive integer.', WARN)
+            return
+        end
+
+        executeCommand('Git reset --mixed HEAD~' .. count)
+    end)
+end
+
 --------------------------------------------------
 -- Configure plugin
 --------------------------------------------------
 local function setupPlugin()
-    bim.keymap.set('n', '<leader>gb', createCommand('Git blame'))
-    bim.keymap.set('n', '<leader>rb', interactiveRebase)
+    vim.keymap.set('n', '<leader>gb', createCommand('Git blame'))
+    vim.keymap.set('n', '<leader>rb', interactiveRebase)
+    vim.keymap.set('n', '<leader>gr', mixedReset)
     vim.keymap.set('n', '<leader>gs', openGitStatusWindow)
     vim.keymap.set('n', '<leader>gl', createCommand('GV HEAD master'))
     vim.keymap.set('n', '<leader>gla', createCommand('GV --all'))
