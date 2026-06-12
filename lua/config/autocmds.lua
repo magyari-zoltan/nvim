@@ -14,9 +14,16 @@ local autoread_group = vim.api.nvim_create_augroup('AutoReadFiles', { clear = tr
 vim.api.nvim_create_autocmd('BufWritePost', {
     group = group,
     callback = function(event)
-        -- Display paths relative to the current working directory or home.
-        local file = vim.fn.fnamemodify(event.match, ':~:.')
+        local filename = vim.fn.fnamemodify(event.file, ':t')
 
+        if filename == 'COMMIT_EDITMSG' then
+            notify('Commit completed successfully', INFO, {
+                title = 'Git commit',
+            })
+            return
+        end
+
+        local file = vim.fn.fnamemodify(event.match, ':~:.')
         notify('Saved ' .. file, INFO, {
             title = 'File saved',
         })
