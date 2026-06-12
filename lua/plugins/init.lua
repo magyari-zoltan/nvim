@@ -1,8 +1,56 @@
 --------------------------------------------------------------------------------
 -- https://github.com/folke/lazy.nvim
 --------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- A `stdpath("data")` visszaadja a Neovim adatkönyvtárát.
+-- Linux alatt pl: `~/.local/share/nvim`
+-- Így a `lazypath` értéke: `~/.local/share/nvim`
+--------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+
+--------------------------------------------------------------------------------
+-- A `vim.uv` a Neovim beépített hozzáférése a `libuv` könyvtárhoz.
+--
+-- A libuv egy alacsony szintű aszinkron I/O könyvtár, amelyet a Neovim számos művelethez használ:
+--
+--  * fájlműveletek 📄
+--  * hálózati kommunikáció 🌐
+--  * folyamatkezelés ⚙️
+--  * időzítők ⏱️
+--  * fájlrendszer figyelése 👀
+--
+-- A `vim.loop` a Neovim régebbi libuv API-ja.
+--
+-- Miért `vim.uv or vim.loop` ?
+--
+-- Ez a kód mindkettővel kompatibilis.
+--
+-- Ellenőrzöm, hogy létezik-e a könyvtár
+--------------------------------------------------------------------------------
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
+	----------------------------------------------------------------------------
+	-- A `lazy.nvim` letöltése
+	--
+	-- A következő parancsot hajtja végre:
+	--
+	-- ```bash
+	-- git clone \
+	--    --filter=blob:none \
+	--    --branch=stable \
+	--    https://github.com/folke/lazy.nvim.git \
+	--    ~/.local/share/nvim/lazy/lazy.nvim
+	-- ```
+	--
+	-- Mit jelent a `--filter=blob:none` ?
+	--
+	-- A Git nem tölti le azonnal a fájlok tartalmát, csak a szükséges
+	-- metaadatokat.
+	--
+	-- ➡️ Gyorsabb klónozás
+	-- ➡️ Kevesebb hálózati forgalom
+	--
+	----------------------------------------------------------------------------
 	vim.fn.system({
 		"git",
 		"clone",
@@ -12,6 +60,25 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 		lazypath,
 	})
 end
+
+--------------------------------------------------------------------------------
+-- A plugin hozzáadása a runtime path-hoz.
+-- A `rtp` a runtimepath rövidítése.
+--
+-- A Neovim innen tölti be:
+--  * pluginokat
+--  * színsémákat
+--  * Lua modulokat
+--  * szintaxisfájloka
+--
+-- A prepend() a lista elejére teszi a lazy.nvim könyvtárát:
+--
+-- ```text
+-- runtimepath =
+--     ~/.local/share/nvim/lazy/lazy.nvim
+--     ...
+-- ```
+--------------------------------------------------------------------------------
 vim.opt.rtp:prepend(lazypath)
 
 --------------------------------------------------------------------------------
@@ -41,7 +108,14 @@ local plugins = {
 	},
 
 	-- Notify
-	{ 'rcarriga/nvim-notify', lazy = false, priority = 1001 },
+	{
+		'rcarriga/nvim-notify',
+		lazy = false,
+		priority = 1001,
+		config = function()
+			require('plugins.nvim-notify')
+		end
+	},
 
 	-- File manager: nvim-tree
 	{
@@ -259,4 +333,25 @@ local plugins = {
 	},
 }
 
+--------------------------------------------------------------------------------
+-- Ez a sor indítja el a `lazy.nvim`-et.
+--
+-- A `require("lazy") betölti a `lazy.nvim` Lua modulját.
+--
+-- A `require(...)` a runtimepath-on keresi a modult. Ezért volt fontos
+-- korábban ez a sor: `vim.opt.rtp:prepend(lazypath)`
+--
+-- A `.setup(...)` a betöltött modul setup() függvényét hívja meg:
+--
+-- ```lua
+--   local lazy = require("lazy")
+--   lazy.setup(plugins, opts)
+-- ```
+--
+-- Ez:
+--  * feldolgozza a plugin listát,
+--  * telepíti a hiányzó pluginokat,
+--  * beállítja a lazy loading szabályokat,
+--  * betölti a szükséges pluginokat.
+--------------------------------------------------------------------------------
 require("lazy").setup(plugins, opts)
