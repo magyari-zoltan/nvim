@@ -4,11 +4,13 @@
 local function setupPlugin()
     vim.notify = require('notify')
     vim.notify.setup({
-        -- level = TRACE
-        -- level = DEBUG
-        level = INFO
-        -- level = WARN
-        -- level = ERROR
+        background_color = "#FF9E3",
+
+        -- level = TRACE,
+        -- level = DEBUG,
+        level = INFO,
+        -- level = WARN,
+        -- level = ERROR,
     })
 end
 
