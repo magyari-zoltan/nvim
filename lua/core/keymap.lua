@@ -86,7 +86,9 @@ end
 --
 local function deleteKeyBinding(mapping)
     notify('deleteKeyBinding: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
-    vim.api.nvim_del_keymap(mapping.mode, mapping.key)
+    if existsKeyBinding(mapping.mode, mapping.key) then
+        vim.api.nvim_del_keymap(mapping.mode, mapping.key)
+    end
 end
 
 --
@@ -187,8 +189,13 @@ local function callBufferKeymapperCallback(buffer)
         return
     end
 
+    local function errorHandler(error)
+        notify('Keybindings for the buffer:' .. tostring(buffer) .. ' could not be created! ERROR: ' .. tostring(error),
+            ERROR)
+    end
+
     for callbackId, callback in pairs(BufferKeymapperCallbacks) do
-        tryCatch(callback, nil, buffer, keybinding)
+        tryCatch(callback, errorHandler, buffer, keybinding)
     end
 
     -- Mark keymapper initialized for this buffer
