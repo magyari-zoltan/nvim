@@ -12,23 +12,23 @@ _G.OFF = vim.log.levels.OFF
 --
 --
 function _G.createCommand(command)
-  return function()
-    vim.api.nvim_command(command)
-  end
+    return function()
+        vim.api.nvim_command(command)
+    end
 end
 
 --
 -- Executes a neo vim command
 --
 function _G.executeCommand(command)
-  vim.api.nvim_command(command)
+    vim.api.nvim_command(command)
 end
 
 --
 -- Send a notification message to user
 --
 function _G.notify(message, level, opts)
-  vim.notify(message, level, opts)
+    vim.notify(message, level, opts)
 end
 
 --
@@ -41,24 +41,24 @@ end
 -- Wraps a function into an error handler
 --
 function _G.try(resolve, args)
-  local ok, message = pcall(resolve, args or {})
+    local ok, message = pcall(resolve, args or {})
 
-  if not ok then
-    notify(message, TRACE)
-  end
+    if not ok then
+        notify(message, ERROR)
+    end
 end
 
 --
 -- Wraps a function into an error handler
 --
-function _G.tryCatch(resolve, reject, args)
-  local ok, message = pcall(resolve, args or {})
+function _G.tryCatch(resolve, reject, ...)
+    local ok, message = pcall(resolve, ...)
 
-  if not ok then
-    if reject then
-      reject(message)
-    else
-      notify(message, TRACE)
+    if not ok then
+        if reject then
+            reject(message)
+        else
+            notify(message, ERROR)
+        end
     end
-  end
 end

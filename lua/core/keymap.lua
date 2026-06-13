@@ -2,8 +2,9 @@
 local Keymap = {} -- Module declaration
 --------------------------------------------------------------------------------
 
-WindowKeyMapper = {}
-WindowMappedKeys = {}
+BufferKeymapperCallbacks = {}
+WindowKeymapperCallbacks = {}
+WindowKeyBindings = {}
 
 --------------------------------------------------
 -- Dependencies
@@ -24,10 +25,10 @@ Keymapper.__index = Keymapper
 --
 -- @param windowId: the
 function Keymapper:new(windowId, onKeymap)
-  local instance = setmetatable({}, Keymapper)
-  instance.windowId = windowId
-  instance.onKeymap = onKeymap
-  return instance
+    local instance = setmetatable({}, Keymapper)
+    instance.windowId = windowId
+    instance.onKeymap = onKeymap
+    return instance
 end
 
 --------------------------------------------------
@@ -36,100 +37,198 @@ end
 local isWindowOpen = Window.isWindowOpen
 local getCurrentWindow = Window.getCurrentWindow
 
-local function deleteMapping(mapping)
-  -- notify('deleteKeyMapping: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
-  vim.api.nvim_del_keymap(mapping.mode, mapping.key)
+--------------------------------------------------
+-- Window key binding related
+--------------------------------------------------
+
+--
+-- Register keybinding to know which bindings should be removed on window leave
+--
+local function registerKeyBinding(window_id, mapping)
+    notify('registerKeymap: ' .. tostring(window_id) .. ',' .. mapping.mode .. ',' .. mapping.key, TRACE)
+    table.insert(WindowKeyBindings[window_id], {
+        mode = mapping.mode,
+        key = mapping.key
+    })
 end
 
-local function createMapping(mapping)
-  -- notify('createMapping: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
-  vim.keymap.set(mapping.mode, mapping.key, mapping.command, mapping.opts)
+--
+-- Unregisters all keybindings for a given window
+--
+local function unregisterKeyBindings(window_id)
+    notify('unregisterKeyBindings: ' .. tostring(window_id), TRACE)
+    WindowKeyBindings[window_id] = nil
 end
 
-local function getKeymapperFromRegistry(window_id)
-  -- notify('getKeymapperFromRegistry: ' .. window_id, DEBUG)
-  return WindowKeyMapper[window_id]
+--
+-- Creates the binding between a key combination and a command
+--
+local function createKeyBinding(mapping)
+    notify('createKeyBinding: ' .. mapping.mode .. ',' .. mapping.key, TRACE)
+    vim.keymap.set(mapping.mode, mapping.key, mapping.command, mapping.opts)
 end
 
-local function registerKeymapper(window_id, on_keymap)
-  -- notify('registerKeymapper: ' .. window_id, DEBUG)
-  WindowKeyMapper[window_id] = on_keymap
-end
-
-local function registerKeymap(window_id, mapping)
-  -- notify('registerKeymap: ' .. tostring(window_id) .. ',' .. mapping.mode .. ',' .. mapping.key, DEBUG)
-  table.insert(WindowMappedKeys[window_id], {
-    mode = mapping.mode,
-    key = mapping.key
-  })
-end
-
-local function clearRegistries(window_id)
-  -- notify('clearRegistries: ' .. window_id, DEBUG)
-  WindowKeyMapper[window_id] = {}
-  WindowMappedKeys[window_id] = {}
-end
-
-local function deleteMappings(window_id)
-  -- notify('deleteMappings: ' .. window_id, DEBUG)
-
-  local bindings = WindowMappedKeys[window_id]
-  if bindings then
-    for _, binding in ipairs(bindings) do
-      try(deleteMapping, binding)
+--
+-- Checks wheter a keybinding is already registered in vim
+--
+local function existsKeyBinding(mode, key)
+    for _, map in ipairs(vim.api.nvim_get_keymap(mode)) do
+        if map.lhs == key then
+            return true
+        end
     end
-  else
-    -- notify('deleteMappings: bindings is nil: ' .. window_id, TRACE)
-  end
+
+    return false
 end
 
-local function mapAllKeysForWindow(window_id, on_keymap, keymapper)
-  -- notify('mapAllKeysForWindow: ' .. window_id .. ',' .. tostring(on_keymap), DEBUG)
+--
+-- Deletes the binding between a key combination and a command
+--
+local function deleteKeyBinding(mapping)
+    notify('deleteKeyBinding: ' .. mapping.mode .. ',' .. mapping.key, DEBUG)
+    vim.api.nvim_del_keymap(mapping.mode, mapping.key)
+end
 
-  local function mapSingleKey(mode, key, command, opts)
-    -- notify('mapAllKeysForWindow: mapSingleKey:' .. window_id .. ',' .. tostring(mode) .. ',' .. tostring(key), DEBUG)
-    keymapper.createMapping({
-      mode = mode,
-      key = key,
-      command = command,
-      opts = opts
-    })
-    keymapper.registerMapping(window_id, {
-      mode = mode,
-      key = key
-    })
-  end
+--
+-- Deletes the binding between a key combination and a command for all registered key bindings
+--
+local function deleteRegisteredKeyBindings(window_id)
+    local bindings = WindowKeyBindings[window_id]
+    if bindings then
+        for _, binding in ipairs(bindings) do
+            try(deleteKeyBinding, binding)
+        end
+    else
+        notify('deleteRegisteredKeyBindings: bindings is nil: ' .. window_id, TRACE)
+    end
+end
 
-  if isWindowOpen(window_id) then
-    tryCatch(on_keymap, keymapper.errorHandler, mapSingleKey)
-  else
-    -- notify('mapAllKeysForWindow: window is closed: ' .. window_id, TRACE)
-  end
+--------------------------------------------------
+-- Window keymapper callback method related
+--------------------------------------------------
+
+--
+-- Registers a keymapper calback method to be able to call it
+-- whenever the window is activated.
+--
+local function registerKeymapperCallback(window_id, on_keymap)
+    notify('registerKeymapperCallback: ' .. window_id, TRACE)
+    WindowKeymapperCallbacks[window_id] = on_keymap
+end
+
+--
+-- Returns the keymapper callback method for a given window.
+--
+local function getKeymapperCallback(window_id)
+    return (WindowKeymapperCallbacks[window_id])
+end
+
+--
+-- Calls the keymapper callback registered to a given window
+--
+local function callKeymapperCallback(window_id)
+    local function keybinding(mode, key, command, opts)
+        if not existsKeyBinding(mode, key) then
+            registerKeyBinding(window_id, {
+                mode = mode,
+                key = key
+            })
+            createKeyBinding({
+                mode = mode,
+                key = key,
+                command = command,
+                opts = opts
+            })
+        end
+    end
+
+    local function errorHandler(error)
+        notify('Keybindings for the window:' .. window_id .. ' could not be created! ERROR: ' .. tostring(error), ERROR)
+        deleteRegisteredKeyBindings(window_id)
+        unregisterKeyBindings(window_id)
+    end
+
+    if not isWindowOpen(window_id) then
+        notify('callKeymapperCallback: window is closed: ' .. window_id, TRACE)
+        return
+    end
+
+    local callback = getKeymapperCallback(window_id)
+
+    if type(callback) == "function" then
+        tryCatch(callback, errorHandler, keybinding)
+    end
+end
+
+
+local function callBufferKeymapperCallback(buffer)
+    buffer = buffer or vim.api.nvim_get_current_buf()
+
+    local function keybinding(mode, key, command, desc, opts)
+        opts = vim.tbl_extend("force", opts or {}, {
+            desc = desc,
+            buffer = buffer,
+            silent = true
+        })
+
+        local mapping = {
+            mode = mode,
+            key = key,
+            command = command,
+            opts = opts
+        }
+
+        createKeyBinding(mapping)
+    end
+
+    -- Keymapper already initialized for this buffer
+    if vim.b[buffer].keymappers then
+        notify('callBufferKeymapperCallback: ' .. buffer .. ' is already initialized.', TRACE)
+        return
+    end
+
+    for callbackId, callback in pairs(BufferKeymapperCallbacks) do
+        tryCatch(callback, nil, buffer, keybinding)
+    end
+
+    -- Mark keymapper initialized for this buffer
+    vim.b[buffer].keymappers = true
+end
+
+--------------------------------------------------
+-- Cleanup registries
+--------------------------------------------------
+
+local function clearRegistriesForWindow(window_id)
+    notify('clearRegistriesForWindow: ' .. window_id, TRACE)
+    WindowKeymapperCallbacks[window_id] = {}
+    WindowKeyBindings[window_id] = {}
 end
 
 --------------------------------------------------------------------------------
 -- Module Api
 --------------------------------------------------------------------------------
 
-function Keymap.registerOnWindowFocusKeymapper(window_id, on_keymap)
-  -- notify('registerWindowKeymapper: ' .. window_id .. ',' .. tostring(on_keymap), DEBUG)
+--
+-- Api for registering keymap on BufEnter
+--
+function Keymap.registerOnBufEnter(callbackId, on_keymap)
+    notify('registerOnBufEnter: ' .. callbackId .. ',' .. tostring(on_keymap), TRACE)
+    BufferKeymapperCallbacks[callbackId] = on_keymap
+end
 
-  if window_id and on_keymap then
-    registerKeymapper(window_id, on_keymap)
+--
+-- Api for registering keymap on WinEnter
+--
+function Keymap.registerOnWinEnter(window_id, on_keymap)
+    notify('registerOnWinEnter: ' .. window_id .. ',' .. tostring(on_keymap), TRACE)
 
-    local function errorHandler(error)
-      -- notify('registerWindowKeymapper: errorHandler: ' .. window_id .. ',' .. tostring(error), TRACE)
-      clearRegistries(window_id)
+    if window_id and on_keymap then
+        registerKeymapperCallback(window_id, on_keymap)
+        callKeymapperCallback(window_id)
+    else
+        notify('registerWindowKeymapper: condition not fullfilled: ' .. window_id .. ',' .. tostring(on_keymap), TRACE)
     end
-
-    mapAllKeysForWindow(window_id, on_keymap, {
-      createMapping = createMapping,
-      registerMapping = registerKeymap,
-      errorHandler = errorHandler
-    })
-  else
-    -- notify('registerWindowKeymapper: condition not fullfilled: ' .. window_id .. ',' .. tostring(on_keymap), TRACE)
-  end
 end
 
 --------------------------------------------------------------------------------
@@ -138,50 +237,52 @@ end
 local group_id = vim.api.nvim_create_augroup("Keymap", { clear = true })
 
 vim.api.nvim_create_autocmd("WinClosed", {
-  group = group_id,
-  pattern = "*",
-  callback = function()
-    local window_id = getCurrentWindow()
-    -- notify('WinClosed: ' .. window_id, DEBUG)
+    group = group_id,
+    pattern = "*",
+    callback = function()
+        local window_id = getCurrentWindow()
+        notify('WinClosed: ' .. window_id, DEBUG)
 
-    deleteMappings(window_id)
-    clearRegistries(window_id)
-  end
+        deleteRegisteredKeyBindings(window_id)
+        clearRegistriesForWindow(window_id)
+    end
 })
 
 vim.api.nvim_create_autocmd("WinLeave", {
-  group = group_id,
-  pattern = "*",
-  callback = function()
-    local window_id = getCurrentWindow()
-    -- notify('WinLeave: ' .. window_id, DEBUG)
+    group = group_id,
+    pattern = "*",
+    callback = function()
+        local window_id = getCurrentWindow()
+        notify('WinLeave: ' .. window_id, DEBUG)
 
-    deleteMappings(window_id)
-  end
+        deleteRegisteredKeyBindings(window_id)
+    end
 })
 
 vim.api.nvim_create_autocmd("WinEnter", {
-  group = group_id,
-  pattern = "*",
-  callback = function()
-    local window_id = getCurrentWindow()
-    -- notify('WinEnter: ' .. window_id, DEBUG)
+    group = group_id,
+    pattern = "*",
+    callback = function()
+        local window_id = getCurrentWindow()
+        notify('WinEnter: ' .. window_id, DEBUG)
 
-    local on_keymap = getKeymapperFromRegistry(window_id)
-    local keymapper = {
-      createMapping = createMapping,
-      registerMapping = doNothing,
-      errorHandler = doNothing
-    }
-
-    if not on_keymap then
-      clearRegistries(window_id)
-      on_keymap = getKeymapperFromRegistry(window_id)
-    else
-      -- notify('WinEnter: WindowMappedKeys is not nil!' .. window_id, TRACE)
-      mapAllKeysForWindow(window_id, on_keymap, keymapper)
+        local on_keymap = getKeymapperCallback(window_id)
+        if not on_keymap then
+            clearRegistriesForWindow(window_id)
+            on_keymap = getKeymapperCallback(window_id)
+        else
+            notify('WinEnter: WindowKeyBindings is not nil!' .. window_id, TRACE)
+            callKeymapperCallback(window_id)
+        end
     end
-  end
+})
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+    group = group_id,
+    pattern = "*",
+    callback = function(event)
+        callBufferKeymapperCallback(event.buffer)
+    end,
 })
 
 --------------------------------------------------

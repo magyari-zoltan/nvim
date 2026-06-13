@@ -88,7 +88,7 @@ local plugins = {
     -- Gruvbox colorscheme
     {
         'ellisonleao/gruvbox.nvim',
-        lazy = false, -- make sure we load this during startup if it is your main colorscheme
+        lazy = false,    -- make sure we load this during startup if it is your main colorscheme
         priority = 1000, -- make sure to load this before all the other start plugins
         config = function()
             executeCommand('set background=dark')
@@ -99,7 +99,7 @@ local plugins = {
     -- Paper colorscheme
     {
         'NLKNguyen/papercolor-theme',
-        lazy = false, -- make sure we load this during startup if it is your main colorscheme
+        lazy = false,    -- make sure we load this during startup if it is your main colorscheme
         priority = 1000, -- make sure to load this before all the other start plugins
         -- config = function()
         --   executeCommand('set background=light')
@@ -216,17 +216,17 @@ local plugins = {
         },
         opts = {
             keymaps     = {
-                toggle = nil,         -- Keybind to toggle Codex window (Disabled by default, watch out for conflicts)
-                quit = '<C-q>',       -- Keybind to close the Codex window (default: Ctrl + q)
-            },                        -- Disable internal default keymap (<leader>cc -> :CodexToggle)
-            border      = 'rounded',  -- Options: 'single', 'double', or 'rounded'
-            width       = 0.8,        -- Width of the floating window (0.0 to 1.0)
-            height      = 0.8,        -- Height of the floating window (0.0 to 1.0)
+                toggle = nil,                  -- Keybind to toggle Codex window (Disabled by default, watch out for conflicts)
+                quit = '<C-q>',                -- Keybind to close the Codex window (default: Ctrl + q)
+            },                                 -- Disable internal default keymap (<leader>cc -> :CodexToggle)
+            border      = 'rounded',           -- Options: 'single', 'double', or 'rounded'
+            width       = 0.8,                 -- Width of the floating window (0.0 to 1.0)
+            height      = 0.8,                 -- Height of the floating window (0.0 to 1.0)
             cmd         = { 'codex', '/vim' }, -- Start each Codex chat in Vim mode
-            model       = nil,        -- Optional: pass a string to use a specific model (e.g., 'o3-mini')
-            autoinstall = true,       -- Automatically install the Codex CLI if not found
-            panel       = false,      -- Open Codex in a side-panel (vertical split) instead of floating window
-            use_buffer  = false,      -- Capture Codex stdout into a normal buffer instead of a terminal buffer
+            model       = nil,                 -- Optional: pass a string to use a specific model (e.g., 'o3-mini')
+            autoinstall = true,                -- Automatically install the Codex CLI if not found
+            panel       = false,               -- Open Codex in a side-panel (vertical split) instead of floating window
+            use_buffer  = false,               -- Capture Codex stdout into a normal buffer instead of a terminal buffer
         },
     },
 

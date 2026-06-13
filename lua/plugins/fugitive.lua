@@ -10,7 +10,8 @@ local keymap = require('core.keymap')
 --------------------------------------------------
 local dockCurrentWindowToRightSide = window.dockCurrentWindowToRightSide
 local getCurrentWindow = window.getCurrentWindow
-local registerOnWindowFocusKeymapper = keymap.registerOnWindowFocusKeymapper
+local registerOnWinEnter = keymap.registerOnWinEnter
+local registerOnBufEnter = keymap.registerOnBufEnter
 
 --
 -- Open file history view
@@ -19,7 +20,7 @@ local function openFileHistoryWindow()
     local window_id = getCurrentWindow()
 
     executeCommand('DiffviewFileHistory')
-    registerOnWindowFocusKeymapper(window_id, function(keybinding)
+    registerOnWinEnter(window_id, function(keybinding)
         keybinding('n', 'q', createCommand('DiffviewClose'))
     end)
 end
@@ -39,7 +40,7 @@ local function openGitStatusWindow()
     local function closeWindow()
         vim.api.nvim_win_close(window_id, false)
     end
-    registerOnWindowFocusKeymapper(window_id, function(keybinding)
+    registerOnWinEnter(window_id, function(keybinding)
         keybinding('n', 'q', closeWindow)
     end)
 end
@@ -81,17 +82,59 @@ local function mixedReset()
     end)
 end
 
+--
+-- Checks if the file belonging to the buffer is git version controlled
+--
+local function isVersionControlledFile(buffer)
+    buffer = buffer or vim.api.nvim_get_current_buf()
+
+    if not vim.api.nvim_buf_is_valid(buffer) then
+        return false
+    end
+
+    if vim.api.nvim_get_option_value('buftype', { buf = buffer }) ~= '' then
+        return false
+    end
+
+    local file = vim.api.nvim_buf_get_name(buffer)
+    if file == '' or vim.fn.filereadable(file) ~= 1 then
+        return false
+    end
+
+    local directory = vim.fs.dirname(file)
+    if not directory then
+        return false
+    end
+
+    vim.fn.systemlist({ 'git', '-C', directory, 'ls-files', '--error-unmatch', '--', file })
+    return vim.v.shell_error == 0
+end
+
+--
+-- Register fugitive keybindings
+--
+local function registerFugitiveKeybindings()
+    registerOnBufEnter('FugitiveKeymaps', function(buffer, keybinding)
+        if not isVersionControlledFile(buffer) then
+            return
+        end
+
+        keybinding('n', '<localleader>gb', createCommand('Git blame'), 'Git blame')
+        keybinding('n', '<leader>rb', interactiveRebase, 'Git interactive rebase')
+        keybinding('n', '<leader>gr', mixedReset, 'Git mixed reset')
+        keybinding('n', '<leader>gs', openGitStatusWindow, 'Git status')
+        keybinding('n', '<leader>gl', createCommand('GV HEAD master'), 'Git log')
+        keybinding('n', '<leader>gla', createCommand('GV --all'), 'Git log all')
+        keybinding('n', '<leader>gh', openFileHistoryWindow, 'Git file history')
+    end)
+end
+
 --------------------------------------------------
 -- Configure plugin
 --------------------------------------------------
+
 local function setupPlugin()
-    vim.keymap.set('n', '<leader>gb', createCommand('Git blame'))
-    vim.keymap.set('n', '<leader>rb', interactiveRebase)
-    vim.keymap.set('n', '<leader>gr', mixedReset)
-    vim.keymap.set('n', '<leader>gs', openGitStatusWindow)
-    vim.keymap.set('n', '<leader>gl', createCommand('GV HEAD master'))
-    vim.keymap.set('n', '<leader>gla', createCommand('GV --all'))
-    vim.keymap.set('n', '<leader>gh', function() openFileHistoryWindow() end)
+    registerFugitiveKeybindings()
 end
 
 --------------------------------------------------
