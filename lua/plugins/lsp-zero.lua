@@ -36,6 +36,11 @@ local function default_keymaps(lsp_zero, bufnr)
     end
 
     local mappings = {
+        { 'n', 'gp',    vim.diagnostic.goto_prev,                            'Previous error' },
+        { 'n', 'gn',    vim.diagnostic.goto_next,                            'Next error' },
+        { 'n', 'ge',    vim.diagnostic.open_float,                           'Show diagnostics' },
+        { 'n', 'gE',    vim.diagnostic.setloclist,                           'Show errors in loc list' },
+
         { 'n', 'gd',    vim.lsp.buf.definition,                              'Go to definition' },
         { 'n', 'gD',    vim.lsp.buf.declaration,                             'Go to declaration' },
         { 'n', 'gi',    vim.lsp.buf.implementation,                          'Go to implementation' },
@@ -193,13 +198,29 @@ local function setupPlugin()
         info = '»'
     })
 
-    -- Disable a feature in every server
-    lsp_zero.set_server_config({
-        -- on_init = function(client)
-        --  client.server_capabilities.semanticTokensProvider = nil
-        --  client.server_capabilities.documentFormattingProvider = false
-        --  client.server_capabilities.documentFormattingRangeProvider = false
-        -- end,
+    -- vim internal diagnostics congig
+    vim.diagnostic.config({
+
+        -- Error text at the end of the line
+        -- virtual_text = {
+        --     prefix = '●',
+        --     spacing = 2,
+        --     source = 'if_many',
+        -- },
+
+        -- virtual_lines = true,     -- Error text in a new line
+        signs = true,             -- Icons in the sign column
+        underline = true,         -- Underlines the error
+        update_in_insert = false, -- Refreseh errors only after leaving insert mode
+        severity_sort = true,     -- Sorts by severity on multiple errors
+
+
+        float = {
+            border = 'rounded', -- style of the popup
+            source = 'always',  -- shows which tool generates the error ('always', 'if_many', false)
+            header = 'Diagnostics',
+            prefix = '⚠  '
+        },
     })
 
     configure_lang_servers(lsp_zero)
