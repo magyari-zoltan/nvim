@@ -235,9 +235,15 @@ local plugins = {
         "github/copilot.vim",
         event = "InsertEnter",
         init = function()
-            vim.g.copilot_settings = vim.tbl_deep_extend("force", vim.g.copilot_settings or {}, {
-                model = "auto",
-            })
+            vim.g.copilot_enterprise_uri = "https://mercedes-benz.ghe.com"
+            vim.g.copilot_settings = vim.tbl_deep_extend("force",
+                vim.g.copilot_settings or {}, {
+                    model = "auto",
+                })
+        end,
+        config = function()
+            vim.cmd.Copilot("setup")
+            vim.cmd.Copilot("enable")
         end,
     },
 
