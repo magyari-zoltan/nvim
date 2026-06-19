@@ -217,6 +217,33 @@ end
 --------------------------------------------------------------------------------
 
 --
+-- Api for registering global keymap
+--
+function Keymap.registerGlobalKeybindings(on_keymap)
+    notify('registerGlobalKeymap: ' .. tostring(on_keymap), TRACE)
+
+    local function keybinding(mode, key, command, desc, opts)
+        opts = vim.tbl_extend("force", opts or {}, {
+            desc = desc,
+            silent = true
+        })
+
+        local mapping = {
+            mode = mode,
+            key = key,
+            command = command,
+            opts = opts
+        }
+
+        createKeyBinding(mapping)
+    end
+
+    if on_keymap then
+        on_keymap(keybinding)
+    end
+end
+
+--
 -- Api for registering keymap on BufEnter
 --
 function Keymap.registerOnBufEnter(callbackId, on_keymap)
