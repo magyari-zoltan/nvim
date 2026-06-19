@@ -8,6 +8,7 @@
 -- This makes the `lazypath` value: `~/.local/share/nvim`
 --------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local copilot_model = "gpt-5-mini"
 
 --------------------------------------------------------------------------------
 -- `vim.uv` is Neovim's built-in access to the `libuv` library.
@@ -248,7 +249,7 @@ local plugins = {
             vim.g.copilot_enterprise_uri = "https://mercedes-benz.ghe.com"
             vim.g.copilot_settings = vim.tbl_deep_extend("force",
                 vim.g.copilot_settings or {}, {
-                    model = "auto",
+                    model = copilot_model,
                 })
         end,
         config = function()
@@ -288,6 +289,7 @@ local plugins = {
             { "<leader>cr", "<cmd>CopilotChatReset<cr>",  desc = "Reset Copilot Chat" },
         },
         opts = {
+            model = copilot_model,
             tools = {
                 "file",
                 "glob",
