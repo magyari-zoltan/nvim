@@ -37,6 +37,8 @@ end
 -- Register markdown keybinding
 --
 local function registerMarkdownKeybindings(conform)
+    --
+    -- Register keybindings for markdown files
     registerOnBufEnter('MarkdownKeymaps', function(buffer, keybinding)
         if isMarkdownFile(buffer) then
             keybinding('n', '<leader>fm', formatMarkdown(conform, buffer), 'Format Markdown')

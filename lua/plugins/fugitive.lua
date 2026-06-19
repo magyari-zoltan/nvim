@@ -12,6 +12,7 @@ local dockCurrentWindowToRightSide = window.dockCurrentWindowToRightSide
 local getCurrentWindow = window.getCurrentWindow
 local registerOnWinEnter = keymap.registerOnWinEnter
 local registerOnBufEnter = keymap.registerOnBufEnter
+local registerGlobalKeybindings = keymap.registerGlobalKeybindings
 
 --
 -- Open file history view
@@ -111,21 +112,40 @@ local function isVersionControlledFile(buffer)
 end
 
 --
+-- Checks whether the current project is a git repository
+--
+local function isGitRepository()
+    local cwd = vim.fn.getcwd()
+    if not cwd or cwd == '' then
+        return false
+    end
+
+    vim.fn.systemlist({ 'git', '-C', cwd, 'rev-parse', '--is-inside-work-tree' })
+    return vim.v.shell_error == 0
+end
+
+--
 -- Register fugitive keybindings
 --
 local function registerFugitiveKeybindings()
+    --
+    -- Register keybindings for git version controlled files
     registerOnBufEnter('FugitiveKeymaps', function(buffer, keybinding)
-        if not isVersionControlledFile(buffer) then
-            return
+        if isVersionControlledFile(buffer) then
+            keybinding('n', '<localleader>gb', createCommand('Git blame'), 'Git blame')
+            keybinding('n', '<leader>gh', openFileHistoryWindow, 'Git file history')
         end
-
-        keybinding('n', '<localleader>gb', createCommand('Git blame'), 'Git blame')
-        keybinding('n', '<leader>rb', interactiveRebase, 'Git interactive rebase')
-        keybinding('n', '<leader>gr', mixedReset, 'Git mixed reset')
-        keybinding('n', '<leader>gs', openGitStatusWindow, 'Git status')
-        keybinding('n', '<leader>gl', createCommand('GV HEAD master'), 'Git log')
-        keybinding('n', '<leader>gla', createCommand('GV --all'), 'Git log all')
-        keybinding('n', '<leader>gh', openFileHistoryWindow, 'Git file history')
+    end)
+    --
+    -- Register global keybindings for git repositories
+    registerGlobalKeybindings(function(keybinding)
+        if isGitRepository() then
+            keybinding('n', '<leader>gs', openGitStatusWindow, 'Git status')
+            keybinding('n', '<leader>rb', interactiveRebase, 'Git interactive rebase')
+            keybinding('n', '<leader>gr', mixedReset, 'Git mixed reset')
+            keybinding('n', '<leader>gl', createCommand('GV HEAD master'), 'Git log')
+            keybinding('n', '<leader>gla', createCommand('GV --all'), 'Git log all')
+        end
     end)
 end
 
