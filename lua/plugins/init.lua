@@ -8,7 +8,7 @@
 -- This makes the `lazypath` value: `~/.local/share/nvim`
 --------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-local copilot_model = "gpt-5-mini"
+local copilot_model = "claude-sonnet-4.6"
 
 --------------------------------------------------------------------------------
 -- `vim.uv` is Neovim's built-in access to the `libuv` library.
@@ -247,13 +247,11 @@ local plugins = {
         event = "InsertEnter",
         init = function()
             vim.g.copilot_enterprise_uri = "https://mercedes-benz.ghe.com"
-            vim.g.copilot_settings = vim.tbl_deep_extend("force",
-                vim.g.copilot_settings or {}, {
-                    model = copilot_model,
-                })
         end,
         config = function()
-            vim.cmd.Copilot("setup")
+            if not vim.g.copilot_settings then
+                vim.cmd.Copilot("setup")
+            end
             vim.cmd.Copilot("enable")
         end,
     },
@@ -261,8 +259,40 @@ local plugins = {
     -- Copilot Chat
     {
         "CopilotC-Nvim/CopilotChat.nvim",
-        branch = "main",
-        dependencies = { "github/copilot.vim", "nvim-lua/plenary.nvim" },
+        dependencies = { "nvim-lua/plenary.nvim", brnach = "master" },
+        build = "make tiktoken",
+        opts = {
+            model = copilot_model,
+            temperature = 0.1,
+            trusted_tools = true,
+            separator = '━━',
+            auto_fold = true, -- Automatically folds non-assistant messages
+            auto_insert_mode = true,
+            window = {
+                title = "Copilot Chat",
+                layout = "float",
+                border = "rounded",
+                width = 0.5,
+                zindex = 100,
+            },
+            header = {
+                user = '👤 You',
+                assistant = '🤖 Copilot',
+                tool = '🔧 Tool',
+            },
+            tools = {
+                "file",
+                "glob",
+                "grep",
+                "bash",
+                "git",
+                "gitdiff"
+            },
+            resources = {
+                "buffer:listed",
+                "glob",
+            },
+        },
         cmd = {
             "CopilotChat",
             "CopilotChatOpen",
@@ -285,23 +315,7 @@ local plugins = {
             "CopilotChatCommitStaged",
         },
         keys = {
-            { "<leader>ct", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
-            { "<leader>cr", "<cmd>CopilotChatReset<cr>",  desc = "Reset Copilot Chat" },
-        },
-        opts = {
-            model = copilot_model,
-            tools = {
-                "file",
-                "glob",
-                "grep",
-                "bash",
-                "git",
-                "gitdiff"
-            },
-            resources = {
-                "buffer:listed",
-                "glob",
-            },
+            { "<leader>cp", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
         },
     },
 
