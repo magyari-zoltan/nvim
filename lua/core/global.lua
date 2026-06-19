@@ -28,7 +28,9 @@ end
 -- Send a notification message to user
 --
 function _G.notify(message, level, opts)
-    vim.notify(message, level, opts)
+    vim.schedule(function()
+        vim.notify(message, level, opts)
+    end)
 end
 
 --
