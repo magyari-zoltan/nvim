@@ -3,12 +3,15 @@
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
--- `stdpath("data")` returns Neovim's data directory.
+-- The `stdpath("data")` returns Neovim's data directory.
+--
 -- On Linux, for example: `~/.local/share/nvim`
 -- This makes the `lazypath` value: `~/.local/share/nvim`
+--
+-- On windows: `C:\Users\<User>\AppData\Local\nvim`
+-- This makes the `lazypath` value: `C:\Users\<User>\AppData\Local\nvim\lazy\lazy.nvim`
 --------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-local copilot_model = "claude-sonnet-4.6"
 
 --------------------------------------------------------------------------------
 -- `vim.uv` is Neovim's built-in access to the `libuv` library.
@@ -17,8 +20,8 @@ local copilot_model = "claude-sonnet-4.6"
 --
 --  * file operations 📄
 --  * network communication 🌐
---  * process management ⚙️
---  * timers ⏱️
+--  * process management 📊
+--  * timers ⏳
 --  * filesystem watching 👀
 --
 -- `vim.loop` is Neovim's older libuv API.
@@ -248,75 +251,20 @@ local plugins = {
         init = function()
             vim.g.copilot_enterprise_uri = "https://mercedes-benz.ghe.com"
         end,
-        config = function()
-            if not vim.g.copilot_settings then
-                vim.cmd.Copilot("setup")
-            end
-            vim.cmd.Copilot("enable")
-        end,
     },
 
-    -- Copilot Chat
+    -- CodeCompanion
     {
-        "CopilotC-Nvim/CopilotChat.nvim",
-        dependencies = { "nvim-lua/plenary.nvim", brnach = "master" },
-        build = "make tiktoken",
-        opts = {
-            model = copilot_model,
-            temperature = 0.1,
-            trusted_tools = true,
-            separator = '━━',
-            auto_fold = true, -- Automatically folds non-assistant messages
-            auto_insert_mode = true,
-            window = {
-                title = "Copilot Chat",
-                layout = "float",
-                border = "rounded",
-                width = 0.5,
-                zindex = 100,
-            },
-            header = {
-                user = '👤 You',
-                assistant = '🤖 Copilot',
-                tool = '🔧 Tool',
-            },
-            tools = {
-                "file",
-                "glob",
-                "grep",
-                "bash",
-                "git",
-                "gitdiff"
-            },
-            resources = {
-                "buffer:listed",
-                "glob",
-            },
+        'olimorris/codecompanion.nvim',
+        cmd = { 'CodeCompanion', 'CodeCompanionChat', 'CodeCompanionCLI', 'CodeCompanionCmd', 'CodeCompanionActions' },
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'nvim-treesitter/nvim-treesitter',
+            'github/copilot.vim',
         },
-        cmd = {
-            "CopilotChat",
-            "CopilotChatOpen",
-            "CopilotChatClose",
-            "CopilotChatToggle",
-            "CopilotChatReset",
-            "CopilotChatStop",
-            "CopilotChatSave",
-            "CopilotChatLoad",
-            "CopilotChatModels",
-            "CopilotChatAgents",
-            "CopilotChatPrompts",
-            "CopilotChatExplain",
-            "CopilotChatReview",
-            "CopilotChatFix",
-            "CopilotChatOptimize",
-            "CopilotChatDocs",
-            "CopilotChatTests",
-            "CopilotChatCommit",
-            "CopilotChatCommitStaged",
-        },
-        keys = {
-            { "<leader>cp", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
-        },
+        init = function()
+            require('plugins.codecompanion')
+        end,
     },
 
     -- Bookmarks
@@ -368,23 +316,9 @@ local plugins = {
 
 --------------------------------------------------------------------------------
 -- This line starts `lazy.nvim`.
---
--- `require("lazy") loads the `lazy.nvim` Lua module.
---
--- `require(...)` looks for the module on the runtimepath. That is why this
--- earlier line was important: `vim.opt.rtp:prepend(lazypath)`
---
--- `.setup(...)` calls the setup() function on the loaded module:
---
--- ```lua
---   local lazy = require("lazy")
---   lazy.setup(plugins, opts)
--- ```
---
--- This:
 --  * processes the plugin list,
 --  * installs the missing plugins,
 --  * configures the lazy loading rules,
 --  * loads the required plugins.
 --------------------------------------------------------------------------------
-require("lazy").setup(plugins, opts)
+require("lazy").setup(plugins, {})

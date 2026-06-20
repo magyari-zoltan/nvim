@@ -127,7 +127,7 @@ end
 --
 -- Register fugitive keybindings
 --
-local function registerFugitiveKeybindings()
+local function registerKeybindings()
     --
     -- Register keybindings for git version controlled files
     registerOnBufEnter('FugitiveKeymaps', function(buffer, keybinding)
@@ -154,7 +154,7 @@ end
 --------------------------------------------------
 
 local function setupPlugin()
-    registerFugitiveKeybindings()
+    registerKeybindings()
 end
 
 --------------------------------------------------
