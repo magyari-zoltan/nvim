@@ -59,7 +59,7 @@ local function default_keymaps(lsp_zero, bufnr)
 end
 -- Configure formatting
 local function configure_formatting(client)
-    if client.supports_method('textDocument/formatting') then
+    if client:supports_method('textDocument/formatting') then
         require('lsp-format').on_attach(client)
     end
 end
