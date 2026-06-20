@@ -89,33 +89,33 @@ vim.opt.rtp:prepend(lazypath)
 -- Plugins
 --------------------------------------------------------------------------------
 local plugins = {
+    -- Paper colorscheme
+    {
+        'NLKNguyen/papercolor-theme',
+        lazy = false,   -- make sure we load this during startup if it is your main colorscheme
+        priority = 100, -- make sure to load this before all the other start plugins
+        config = function()
+            executeCommand('set background=dark')
+            executeCommand('colorscheme PaperColor')
+        end
+    },
+
     -- Gruvbox colorscheme
     {
         'ellisonleao/gruvbox.nvim',
-        lazy = false,    -- make sure we load this during startup if it is your main colorscheme
-        priority = 1000, -- make sure to load this before all the other start plugins
+        lazy = false,   -- make sure we load this during startup if it is your main colorscheme
+        priority = 101, -- make sure to load this before all the other start plugins
         config = function()
             executeCommand('set background=dark')
             executeCommand('colorscheme gruvbox')
         end
     },
 
-    -- Paper colorscheme
-    {
-        'NLKNguyen/papercolor-theme',
-        lazy = false,    -- make sure we load this during startup if it is your main colorscheme
-        priority = 1000, -- make sure to load this before all the other start plugins
-        -- config = function()
-        --   executeCommand('set background=light')
-        --   executeCommand('colorscheme papercolor')
-        -- end
-    },
-
     -- Notify
     {
         'rcarriga/nvim-notify',
         lazy = false,
-        priority = 1001,
+        priority = 1000,
         config = function()
             require('plugins.nvim-notify')
         end
