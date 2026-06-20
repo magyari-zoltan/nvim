@@ -56,18 +56,16 @@ local function setupPlugin()
                 adapter = "copilot",
                 opts = {
                     language = "Hungarian",
-                    enterprise_uri = "https://mercedes-benz.ghe.com"
                 },
-                -- Change the default icons
                 icons = {
-                    buffer_sync_all = "󰪴 ",
+                    buffer_sync_all = "📡 ",
                     buffer_sync_diff = " ",
-                    chat_context = " ",
-                    chat_fold = " ",
-                    tool_pending = "  ",
-                    tool_in_progress = "  ",
-                    tool_failure = "  ",
-                    tool_success = "  ",
+                    chat_context = "📌 ",
+                    chat_fold = "📑 ",
+                    tool_pending = "🪢  ",
+                    tool_in_progress = "⏳  ",
+                    tool_failure = "💥  ",
+                    tool_success = "✨  ",
                 },
                 date_format = "%A, %Y %B %d",
             },
@@ -75,7 +73,6 @@ local function setupPlugin()
                 adapter = "copilot",
                 opts = {
                     language = "Hungarian",
-                    enterprise_uri = "https://mercedes-benz.ghe.com"
                 },
             },
         },
