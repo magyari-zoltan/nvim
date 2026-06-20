@@ -229,7 +229,7 @@ local plugins = {
         "github/copilot.vim",
         event = "InsertEnter",
         init = function()
-            vim.g.copilot_enterprise_uri = "https://mercedes-benz.ghe.com"
+            -- vim.g.copilot_enterprise_uri = "https://mercedes-benz.ghe.com"
         end,
     },
 
