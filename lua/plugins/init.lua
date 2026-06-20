@@ -88,28 +88,8 @@ vim.opt.rtp:prepend(lazypath)
 --------------------------------------------------------------------------------
 -- Plugins
 --------------------------------------------------------------------------------
-local plugins = {
-    -- Paper colorscheme
-    {
-        'NLKNguyen/papercolor-theme',
-        lazy = false,   -- make sure we load this during startup if it is your main colorscheme
-        priority = 100, -- make sure to load this before all the other start plugins
-        config = function()
-            executeCommand('set background=dark')
-            executeCommand('colorscheme PaperColor')
-        end
-    },
 
-    -- Gruvbox colorscheme
-    {
-        'ellisonleao/gruvbox.nvim',
-        lazy = false,   -- make sure we load this during startup if it is your main colorscheme
-        priority = 101, -- make sure to load this before all the other start plugins
-        config = function()
-            executeCommand('set background=dark')
-            executeCommand('colorscheme gruvbox')
-        end
-    },
+local plugins = {
 
     -- Notify
     {
@@ -128,24 +108,6 @@ local plugins = {
         config = function()
             require('plugins.nvim-tree')
         end
-    },
-
-    -- Status line & icons
-    {
-        'nvim-lualine/lualine.nvim',
-        dependencies = { 'nvim-tree/nvim-web-devicons' },
-        opts = {
-            options = {
-                icons_enabled = true,
-                theme = 'gruvbox'
-            },
-
-            sections = {
-                lualine_a = {
-                    { 'filename', path = 1, }
-                }
-            }
-        }
     },
 
     -- Telescope
@@ -293,6 +255,12 @@ local plugins = {
         end,
     },
 }
+
+--------------------------------------------------------------------------------
+-- Add colorscheme plugins to the main plugin list.
+--------------------------------------------------------------------------------
+local colorschemes = require('plugins.colorscheme')
+vim.list_extend(plugins, colorschemes)
 
 --------------------------------------------------------------------------------
 -- This line starts `lazy.nvim`.
