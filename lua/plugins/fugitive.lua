@@ -18,9 +18,9 @@ local registerGlobalKeybindings = keymap.registerGlobalKeybindings
 -- Open file history view
 --
 local function openFileHistoryWindow()
+    executeCommand('DiffviewFileHistory')
     local window_id = getCurrentWindow()
 
-    executeCommand('DiffviewFileHistory')
     registerOnWinEnter(window_id, function(keybinding)
         keybinding('n', 'q', createCommand('DiffviewClose'))
     end)

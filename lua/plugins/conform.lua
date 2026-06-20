@@ -51,9 +51,9 @@ end
 -- Format markdown on save
 --
 local function registerMarkdownFormatOnSave(conform)
-    local grou_id = vim.api.nvim_create_augroup('MarkdownFormatOnSave', { clear = true })
+    local group = vim.api.nvim_create_augroup('MarkdownFormatOnSave', { clear = true })
     vim.api.nvim_create_autocmd('BufWritePre', {
-        group = grou_id,
+        group = group,
         pattern = '*.md',
         callback = function(event)
             conform.format({ bufnr = event.buf, lsp_fallback = true })
