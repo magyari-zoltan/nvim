@@ -1,3 +1,7 @@
+---
+--- https://codecompanion.olimorris.dev/configuration/chat-buffer#context
+---
+
 --------------------------------------------------
 -- Dependencies
 --------------------------------------------------
@@ -51,28 +55,61 @@ end
 
 local function setupPlugin()
     require("codecompanion").setup({
-        interactions = {
+        display = {
             chat = {
-                adapter = "copilot",
-                opts = {
-                    language = "Hungarian",
-                },
                 icons = {
                     buffer_sync_all = "📡 ",
                     buffer_sync_diff = " ",
                     chat_context = "📌 ",
-                    chat_fold = "📑 ",
+                    chat_fold = "📁 ",
                     tool_pending = "🪢  ",
                     tool_in_progress = "⏳  ",
                     tool_failure = "💥  ",
                     tool_success = "✨  ",
                 },
-                date_format = "%A, %Y %B %d",
+                fold_context = true,
+                fold_reasoning = false,
+                show_reasoning = false,
+            },
+        },
+        interactions = {
+            chat = {
+                adapter = "copilot",
+                roles = {
+                    ---The header name for the LLM's messages
+                    ---@type string|fun(adapter: CodeCompanion.Adapter): string
+                    llm = function(adapter)
+                        return "CodeCompanion (" .. adapter.formatted_name .. "): 🤖"
+                    end,
+
+                    ---The header name for your messages
+                    ---@type string
+                    user = "Me: 🤠 ",
+                },
+                tools = {
+                    opts = {
+                        default_tools = {
+                            "agent",
+                            "files",
+                            "web_search",
+                            "fetch_webpage",
+                            "memory",
+                        },
+                    },
+                },
             },
             inline = {
                 adapter = "copilot",
-                opts = {
-                    language = "Hungarian",
+                tools = {
+                    opts = {
+                        default_tools = {
+                            "agent",
+                            "files",
+                            "web_search",
+                            "fetch_webpage",
+                            "memory",
+                        },
+                    },
                 },
             },
         },
