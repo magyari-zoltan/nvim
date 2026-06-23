@@ -43,7 +43,7 @@ local function registerKeybindings()
     -- Register global keybindings
     registerGlobalKeybindings(function(keybinding)
         -- Copilot chat (open in right vertical split)
-        keybinding('n', '<leader>cp', createCommand('CodeCompanionChat'), 'Copilot Chat')
+        keybinding('n', '<leader>cp', createCommand('CodeCompanionChat Toggle'), 'Copilot Chat')
         keybinding('n', '<leader>ca', createCommand('CodeCompanionActions'), 'Copilot Actions')
     end)
 end
