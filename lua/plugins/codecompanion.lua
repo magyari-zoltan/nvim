@@ -75,17 +75,6 @@ local function setupPlugin()
         interactions = {
             chat = {
                 adapter = "copilot",
-                roles = {
-                    ---The header name for the LLM's messages
-                    ---@type string|fun(adapter: CodeCompanion.Adapter): string
-                    llm = function(adapter)
-                        return "CodeCompanion (" .. adapter.formatted_name .. "): 🤖"
-                    end,
-
-                    ---The header name for your messages
-                    ---@type string
-                    user = "Me: 🤠 ",
-                },
                 tools = {
                     opts = {
                         default_tools = {
@@ -93,24 +82,13 @@ local function setupPlugin()
                             "files",
                             "web_search",
                             "fetch_webpage",
-                            "memory",
+                            --"memory", -- Needs the `<project root>/memories/` folder to exist
                         },
                     },
                 },
             },
             inline = {
                 adapter = "copilot",
-                tools = {
-                    opts = {
-                        default_tools = {
-                            "agent",
-                            "files",
-                            "web_search",
-                            "fetch_webpage",
-                            "memory",
-                        },
-                    },
-                },
             },
         },
     })
