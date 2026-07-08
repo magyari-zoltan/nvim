@@ -39,7 +39,7 @@ vim.keymap.set('n', '%%', ':source %<Enter>', { noremap = true })
 -- Terminal
 local function openTerminalWindow()
     executeCommand('split')
-    dockCurrentWindowToBottom(10)
+    dockCurrentWindowToBottom(7)
     executeCommand('terminal')
 end
 
