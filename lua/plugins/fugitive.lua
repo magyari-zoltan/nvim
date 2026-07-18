@@ -13,6 +13,7 @@ local getCurrentWindow = window.getCurrentWindow
 local registerOnWinEnter = keymap.registerOnWinEnter
 local registerOnBufEnter = keymap.registerOnBufEnter
 local registerGlobalKeybindings = keymap.registerGlobalKeybindings
+local isGitRepository
 
 --
 -- Open file history view
@@ -30,6 +31,11 @@ end
 -- Opens git status window
 --
 local function openGitStatusWindow()
+    if not isGitRepository() then
+        notify('Not inside a git repository.', WARN)
+        return
+    end
+
     local function openFugitveWindow()
         executeCommand('Git') -- Opens fugitive window
     end
@@ -50,6 +56,11 @@ end
 -- Starts an interactive rebase: `git rebase -i <branch>`
 --
 local function interactiveRebase()
+    if not isGitRepository() then
+        notify('Not inside a git repository.', WARN)
+        return
+    end
+
     vim.ui.input({ prompt = 'Rebase onto branch: ' }, function(branch)
         if not branch or vim.trim(branch) == '' then
             return
@@ -63,6 +74,11 @@ end
 -- Resets get a given number of commits: `git reset --mixed HEAD~<number>`
 --
 local function mixedReset()
+    if not isGitRepository() then
+        notify('Not inside a git repository.', WARN)
+        return
+    end
+
     vim.ui.input({ prompt = 'Reset (--mixed) commits from HEAD (default 1): ' }, function(commit_count)
         if not commit_count then
             return
@@ -114,7 +130,7 @@ end
 --
 -- Checks whether the current project is a git repository
 --
-local function isGitRepository()
+function isGitRepository()
     local cwd = vim.fn.getcwd()
     if not cwd or cwd == '' then
         return false
@@ -122,6 +138,19 @@ local function isGitRepository()
 
     vim.fn.systemlist({ 'git', '-C', cwd, 'rev-parse', '--is-inside-work-tree' })
     return vim.v.shell_error == 0
+end
+
+--
+-- Runs a command only inside a git repository
+--
+local function runInGitRepository(command)
+    return function()
+        if isGitRepository() then
+            executeCommand(command)
+        else
+            notify('Not inside a git repository.', WARN)
+        end
+    end
 end
 
 --
@@ -139,13 +168,11 @@ local function registerKeybindings()
     --
     -- Register global keybindings for git repositories
     registerGlobalKeybindings(function(keybinding)
-        if isGitRepository() then
-            keybinding('n', '<leader>gs', openGitStatusWindow, 'Git status')
-            keybinding('n', '<leader>rb', interactiveRebase, 'Git interactive rebase')
-            keybinding('n', '<leader>gr', mixedReset, 'Git mixed reset')
-            keybinding('n', '<leader>gl', createCommand('GV HEAD master'), 'Git log')
-            keybinding('n', '<leader>gla', createCommand('GV --all'), 'Git log all')
-        end
+        keybinding('n', '<leader>gs', openGitStatusWindow, 'Git status')
+        keybinding('n', '<leader>rb', interactiveRebase, 'Git interactive rebase')
+        keybinding('n', '<leader>gr', mixedReset, 'Git mixed reset')
+        keybinding('n', '<leader>gl', runInGitRepository('GV'), 'Git log')
+        keybinding('n', '<leader>gla', runInGitRepository('GV --all'), 'Git log all')
     end)
 end
 

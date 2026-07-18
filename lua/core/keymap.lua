@@ -163,8 +163,9 @@ local function callKeymapperCallback(window_id)
 end
 
 
-local function callBufferKeymapperCallback(buffer)
+local function callBufferKeymapperCallback(buffer, callback_id)
     buffer = buffer or vim.api.nvim_get_current_buf()
+    local did_create_keybinding = false
 
     local function keybinding(mode, key, command, desc, opts)
         opts = vim.tbl_extend("force", opts or {}, {
@@ -181,11 +182,20 @@ local function callBufferKeymapperCallback(buffer)
         }
 
         createKeyBinding(mapping)
+        did_create_keybinding = true
+    end
+
+    if not vim.api.nvim_buf_is_valid(buffer) then
+        return
+    end
+
+    if type(vim.b[buffer].keymappers) ~= 'table' then
+        vim.b[buffer].keymappers = {}
     end
 
     -- Keymapper already initialized for this buffer
-    if vim.b[buffer].keymappers then
-        notify('callBufferKeymapperCallback: ' .. buffer .. ' is already initialized.', TRACE)
+    if callback_id and vim.b[buffer].keymappers[callback_id] then
+        notify('callBufferKeymapperCallback: ' .. buffer .. '/' .. callback_id .. ' is already initialized.', TRACE)
         return
     end
 
@@ -194,12 +204,27 @@ local function callBufferKeymapperCallback(buffer)
             ERROR)
     end
 
-    for callbackId, callback in pairs(BufferKeymapperCallbacks) do
-        tryCatch(callback, errorHandler, buffer, keybinding)
+    if callback_id then
+        local callback = BufferKeymapperCallbacks[callback_id]
+        if callback then
+            did_create_keybinding = false
+            tryCatch(callback, errorHandler, buffer, keybinding)
+            if did_create_keybinding then
+                vim.b[buffer].keymappers[callback_id] = true
+            end
+        end
+        return
     end
 
-    -- Mark keymapper initialized for this buffer
-    vim.b[buffer].keymappers = true
+    for callbackId, callback in pairs(BufferKeymapperCallbacks) do
+        if not vim.b[buffer].keymappers[callbackId] then
+            did_create_keybinding = false
+            tryCatch(callback, errorHandler, buffer, keybinding)
+            if did_create_keybinding then
+                vim.b[buffer].keymappers[callbackId] = true
+            end
+        end
+    end
 end
 
 --------------------------------------------------
@@ -249,6 +274,10 @@ end
 function Keymap.registerOnBufEnter(callbackId, on_keymap)
     notify('registerOnBufEnter: ' .. callbackId .. ',' .. tostring(on_keymap), TRACE)
     BufferKeymapperCallbacks[callbackId] = on_keymap
+
+    for _, buffer in ipairs(vim.api.nvim_list_bufs()) do
+        callBufferKeymapperCallback(buffer, callbackId)
+    end
 end
 
 --

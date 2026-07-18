@@ -43,8 +43,29 @@ local function openTerminalWindow()
     executeCommand('terminal')
 end
 
+local function openCopilotTerminalWindow()
+    executeCommand('vsplit')
+    executeCommand('terminal copilot')
+    executeCommand('startinsert')
+end
+
+local function openCodexTerminalWindow()
+    executeCommand('vsplit')
+    executeCommand('terminal codex')
+    executeCommand('startinsert')
+end
+
+local function openClaudeTerminalWindow()
+    executeCommand('vsplit')
+    executeCommand('terminal claude')
+    executeCommand('startinsert')
+end
+
 vim.keymap.set('n', '<C-t>', openTerminalWindow, { noremap = true })
-vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { noremap = true })
+vim.keymap.set('n', '<leader>cp', openCopilotTerminalWindow, { noremap = true })
+vim.keymap.set('n', '<leader>cd', openCodexTerminalWindow, { noremap = true })
+vim.keymap.set('n', '<leader>cl', openClaudeTerminalWindow, { noremap = true })
+vim.keymap.set('t', '<C-x>', '<C-\\><C-n>', { noremap = true })
 vim.keymap.set('t', '<C-h>', '<C-\\><C-n><C-w>h', { noremap = true })
 vim.keymap.set('t', '<C-j>', '<C-\\><C-n><C-w>j', { noremap = true })
 vim.keymap.set('t', '<C-k>', '<C-\\><C-n><C-w>k', { noremap = true })

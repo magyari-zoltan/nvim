@@ -8,9 +8,9 @@ local function setupPlugin()
 
         -- level = TRACE,
         -- level = DEBUG,
-        level = INFO,
+        -- level = INFO,
         -- level = WARN,
-        -- level = ERROR,
+        level = ERROR,
     })
 end
 

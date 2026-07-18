@@ -177,35 +177,12 @@ local plugins = {
         end
     },
 
-    -- OpenAI Codex
-    {
-        'kkrampis/codex.nvim',
-        cmd = { 'Codex', 'CodexToggle' }, -- Optional: Load only on command execution
-        init = function()
-            require('plugins.openai')
-        end,
-    },
-
     -- Github copilot
     {
         "github/copilot.vim",
         event = "InsertEnter",
         init = function()
             -- vim.g.copilot_enterprise_uri = "https://mercedes-benz.ghe.com"
-        end,
-    },
-
-    -- CodeCompanion
-    {
-        'olimorris/codecompanion.nvim',
-        cmd = { 'CodeCompanion', 'CodeCompanionChat', 'CodeCompanionCLI', 'CodeCompanionCmd', 'CodeCompanionActions' },
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-            'nvim-treesitter/nvim-treesitter',
-            'github/copilot.vim',
-        },
-        init = function()
-            require('plugins.codecompanion')
         end,
     },
 
