@@ -70,7 +70,7 @@ local function setupPlugin()
             sorter = "case_sensitive",
         },
         view = {
-            width = 40,
+            width = "25%",
         },
         git = {
             enable = true,
@@ -103,7 +103,8 @@ local function setupPlugin()
         },
     }
 
-    vim.api.nvim_set_keymap('n', '<m-e>', ':NvimTreeFindFileToggle<Enter>', { noremap = true })
+    vim.api.nvim_set_keymap('n', '<M-e>', ':NvimTreeFindFileToggle<Enter>', { noremap = true })
+    vim.api.nvim_set_keymap('n', '<M-S-e>', ':NvimTreeFindFile<Enter>', { noremap = true })
 end
 
 --------------------------------------------------
