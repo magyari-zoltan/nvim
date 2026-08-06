@@ -65,8 +65,8 @@ vim.api.nvim_create_autocmd('FileChangedShellPost', {
     end,
 })
 
---- Refresh GV by closing any existing GV tabs first, then reopening once.
--- GV always creates a new tab, so reusing an existing GV window would pile up tabs.
+--------------------------------------------------------------------------------
+-- Refresh GV by closing any existing GV tabs first, then reopening once.
 --------------------------------------------------------------------------------
 local function normalizeGVCommand(command)
     if type(command) ~= 'string' then
