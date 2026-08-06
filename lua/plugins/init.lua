@@ -133,13 +133,23 @@ local plugins = {
     {
         'tpope/vim-fugitive',
         dependencies = {
-            { 'sindrets/diffview.nvim' },
             { 'mhinz/vim-signify' },
             { 'junegunn/gv.vim' },
         },
         config = function()
             require('plugins.fugitive')
         end
+    },
+
+    -- Git diff viewer
+    {
+        'sindrets/diffview.nvim',
+        dependencies = { 'nvim-lua/plenary.nvim' },
+        cmd = {
+            'DiffviewOpen',
+            'DiffviewClose',
+            'DiffviewFileHistory',
+        },
     },
 
     -- LSP
