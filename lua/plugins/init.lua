@@ -142,15 +142,6 @@ local plugins = {
         end
     },
 
-    -- Git conflict resolution
-    {
-        'akinsho/git-conflict.nvim',
-        event = 'BufReadPre',
-        config = function()
-            require('plugins.git-conflict')
-        end,
-    },
-
     -- LSP
     {
         'VonHeikemen/lsp-zero.nvim',
