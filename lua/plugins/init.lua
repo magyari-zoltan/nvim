@@ -141,6 +141,13 @@ local plugins = {
         end
     },
 
+    -- Git conflict resolver
+    {
+        'akinsho/git-conflict.nvim',
+        version = '*',
+        config = true,
+    },
+
     -- Git diff viewer
     {
         'sindrets/diffview.nvim',
