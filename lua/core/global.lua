@@ -20,8 +20,21 @@ end
 --
 -- Executes a neo vim command
 --
+local function isGVCommand(command)
+    return command == 'GV' or command:match('^GV%s') ~= nil
+end
+
 function _G.executeCommand(command)
     vim.api.nvim_command(command)
+
+    if isGVCommand(command) then
+        vim.g.gv_last_command = command
+
+        local buffer = vim.api.nvim_get_current_buf()
+        if vim.api.nvim_buf_is_valid(buffer) and vim.bo[buffer].filetype == 'GV' then
+            vim.b[buffer].gv_command = command
+        end
+    end
 end
 
 --
