@@ -59,3 +59,27 @@ vim.api.nvim_create_autocmd('FileChangedShellPost', {
         })
     end,
 })
+
+--------------------------------------------------------------------------------
+-- Close terminal windows that opt in once their job exits.
+--------------------------------------------------------------------------------
+vim.api.nvim_create_autocmd('TermClose', {
+    group = autoread_group,
+    callback = function(event)
+        if not vim.api.nvim_buf_is_valid(event.buf) then
+            return
+        end
+
+        if not vim.b[event.buf].close_window_on_exit then
+            return
+        end
+
+        vim.schedule(function()
+            for _, window in ipairs(vim.fn.win_findbuf(event.buf)) do
+                if vim.api.nvim_win_is_valid(window) then
+                    pcall(vim.api.nvim_win_close, window, true)
+                end
+            end
+        end)
+    end,
+})

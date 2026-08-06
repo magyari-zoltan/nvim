@@ -45,31 +45,36 @@ vim.keymap.set('n', '%%', ':source %<Enter>', { noremap = true })
 -- Terminal
 local function openTerminalWindow()
     executeCommand('split')
-    dockCurrentWindowToBottom(7)
+    dockCurrentWindowToBottom('20%')
     executeCommand('terminal')
 end
 
 local function openTerminalWindowRight()
     executeCommand('vsplit')
-    -- dockCurrentWindowToRightSide(80)
     executeCommand('terminal')
 end
 
 local function openCopilotTerminalWindow()
     executeCommand('vsplit')
+    dockCurrentWindowToRightSide('25%')
     executeCommand('terminal copilot')
+    vim.b.close_window_on_exit = true
     executeCommand('startinsert')
 end
 
 local function openCodexTerminalWindow()
     executeCommand('vsplit')
+    dockCurrentWindowToRightSide('25%')
     executeCommand('terminal codex')
+    vim.b.close_window_on_exit = true
     executeCommand('startinsert')
 end
 
 local function openClaudeTerminalWindow()
     executeCommand('vsplit')
+    dockCurrentWindowToRightSide('25%')
     executeCommand('terminal claude')
+    vim.b.close_window_on_exit = true
     executeCommand('startinsert')
 end
 
@@ -77,7 +82,7 @@ end
 vim.keymap.set('n', '<M-t>', openTerminalWindow, { noremap = true })
 vim.keymap.set('n', '<M-S-t>', openTerminalWindowRight, { noremap = true })
 
--- Escaping terminl
+-- Escaping terminal
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { noremap = true })
 vim.keymap.set('t', '<Esc><Esc>', '<Esc>', { noremap = true })
 

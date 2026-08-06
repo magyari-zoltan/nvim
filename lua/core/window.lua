@@ -7,6 +7,47 @@ local Window = {} -- Module declaration
 --------------------------------------------------
 
 --
+-- Resolve the size of a docked window based on the given size and total
+-- dimension.
+--
+-- * If size is then it is returned as is.
+--
+-- * If size is a string representing a number (e.g., "80"), it is converted
+--   to a number and returned.
+--
+-- * If size is a string ending with '%', (e.g., "25%"), it is treated as a
+--   percentage of the total dimension and the corresponding size is
+--   calculated and returned.
+--
+local function resolveDockSize(size, total, dimension)
+    if type(size) == 'number' then
+        return size
+    end
+
+    if type(size) == 'string' then
+        local trimmed = vim.trim(size)
+
+        if vim.endswith(trimmed, '%') then
+            local percentage = tonumber(vim.trim(trimmed:sub(1, -2)))
+            if not percentage then
+                notify('Invalid ' .. dimension .. ' percentage: ' .. size, vim.log.levels.WARN)
+                return nil
+            end
+
+            return math.floor(total * percentage / 100)
+        end
+
+        local absolute = tonumber(trimmed)
+        if absolute then
+            return absolute
+        end
+    end
+
+    notify('Invalid ' .. dimension .. ' size: ' .. tostring(size), vim.log.levels.WARN)
+    return nil
+end
+
+--
 -- Set focus on a giwen window
 --
 function Window.setCurrentWindow(window)
@@ -45,9 +86,17 @@ end
 -- Dock current window to the right side
 --
 function Window.dockCurrentWindowToRightSide(size)
+    local width = resolveDockSize(size, vim.o.columns, 'width')
+    if not width then
+        return
+    end
+    if width < 1 then
+        width = 1
+    end
+
     executeCommand('wincmd L')
     executeCommand('setlocal winfixwidth')
-    executeCommand('vertical resize ' .. size)
+    executeCommand('vertical resize ' .. width)
     executeCommand('set nowrap')
 end
 
@@ -55,35 +104,18 @@ end
 -- Dock current window to the bottom
 --
 function Window.dockCurrentWindowToBottom(size)
+    local height = resolveDockSize(size, vim.o.lines, 'height')
+    if not height then
+        return
+    end
+    if height < 1 then
+        height = 1
+    end
+
     executeCommand('wincmd J')
     executeCommand('setlocal winfixheight')
-    executeCommand('resize ' .. size)
+    executeCommand('resize ' .. height)
 end
-
---------------------------------------------------
--- TODO: Api methods to try out
---------------------------------------------------
-
---
--- Check if window is floating
---
---function isFloating(window)
---  return vim.api.nvim_win_get_config(window).relative ~= ''
---end
-
---
--- Create floating window
---
---function createFloatingWindow()
---  let buf = nvim_create_buf(v:false, v:true)
---  call nvim_buf_set_lines(buf, 0, -1, v:true, ['test', 'text'])
---
---  let opts = {'relative': 'cursor', 'width': 10, 'height': 2, 'col': 0, 'row': 1, 'anchor': 'NW', 'style': 'minimal'}
---  let win = nvim_open_win(buf, 0, opts)
---
---  -- optional: change highlight, otherwise Pmenu is used
---  call nvim_win_set_option(win, 'winhl', 'Normal:MyHighlight')
---:end
 
 --------------------------------------------------
 return Window -- Return the module
